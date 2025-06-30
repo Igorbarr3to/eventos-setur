@@ -122,21 +122,17 @@ export default function FormMotoCross() {
         const jsonData = JSON.stringify(dataToSend, null, 2);
         console.log(jsonData); // Exibe o JSON no console
 
-        // Simulação de envio para um backend
-        alert('Pesquisa gerada (verifique o console para o JSON). Em um ambiente real, seria enviada para um servidor.');
+        // Simulação de envio para backend
+        alert('Pesquisa gerada (verifique o console para o JSON).');
 
-        // Opcional: Resetar o formulário após o envio
+        // Resetar o formulário após o envio
         form.reset();
     };
 
     // Função auxiliar para limpar a resposta de uma pergunta específica
     // Melhorando a tipagem para lidar com strings e valores literais
     const handleClearQuestion = (fieldName: keyof SurveyFormData) => {
-        // For RadioGroup, setting to an empty string effectively unselects all
-        // For Input, setting to an empty string clears the text
         form.setValue(fieldName, '' as any, { shouldValidate: true });
-        // { shouldValidate: true } can be added if you want to trigger validation
-        // immediately after clearing.
 
         // Limpa também o campo 'outro' associado, se houver
         if (fieldName === 'comoSoube') {
@@ -151,13 +147,9 @@ export default function FormMotoCross() {
     };
 
     return (
-        <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-            <h1 className="text-3xl font-bold text-center mb-4">Campeonato Estadual de Motocross Rondoniense 2025 - Pesquisa</h1>
-            <p className="text-center text-gray-600 mb-2">Data: 28/06 a 29/06/2025</p>
-            <p className="text-center text-gray-600 mb-8">Local: Pista de motocross - Linha P50, Km 02 (antigo lixão)</p>
-
+        <div className="flex flex-col sm:p-6 lg:p-8">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 bg-white p-10 rounded-lg shadow-md mx-40">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-2 py-4 bg-white rounded-lg shadow-md lg:mx-40">
                     {/* Pergunta 1: Perfil do respondente */}
                     <FormField
                         control={form.control}
@@ -172,7 +164,7 @@ export default function FormMotoCross() {
                                         size="sm"
                                         onClick={() => handleClearQuestion('perfil')}
                                     >
-                                        Limpar Resposta
+                                        Limpar resposta 
                                     </Button>
                                 </div>
                                 <FormControl>
@@ -328,7 +320,7 @@ export default function FormMotoCross() {
                         )}
                     />
 
-                    {/* Pergunta 4: Onde se hospedou? (AGORA SEMPRE VISÍVEL) */}
+                    {/* Pergunta 4: Onde se hospedou? */}
                     <FormField
                         control={form.control}
                         name="hospedagem"
@@ -387,7 +379,7 @@ export default function FormMotoCross() {
                             </FormItem>
                         )}
                     />
-                    {/* Campo Outro para hospedagem: sempre visível */}
+                    {/* Campo Outro para hospedagem*/}
                     <FormField
                         control={form.control}
                         name="outroHospedagemText"
@@ -461,7 +453,7 @@ export default function FormMotoCross() {
                             </FormItem>
                         )}
                     />
-                    {/* Campo Outro para gasto: sempre visível */}
+                    {/* Campo Outro para gasto*/}
                     <FormField
                         control={form.control}
                         name="outroGastoText"
@@ -524,7 +516,7 @@ export default function FormMotoCross() {
                         )}
                     />
 
-                    {/* Pergunta 7: Qual o maior impacto? (AGORA SEMPRE VISÍVEL) */}
+                    {/* Pergunta 7: Qual o maior impacto? */}
                     <FormField
                         control={form.control}
                         name="maiorImpacto"
@@ -583,7 +575,7 @@ export default function FormMotoCross() {
                             </FormItem>
                         )}
                     />
-                    {/* Campo Outro para impacto: sempre visível */}
+                    {/* Campo Outro para impacto*/}
                     <FormField
                         control={form.control}
                         name="outroImpactoText"
@@ -928,7 +920,7 @@ export default function FormMotoCross() {
                         )}
                     />
 
-                    <div className="text-center mx-[30%]">
+                    <div className="text-center mx-[10%] md:mx-[30%]">
                         <Button type="submit"
                             className="w-full text-slate-200 text-lg bg-slate-700 hover:border-2 hover:border-slate-900 hover:bg-slate-50 hover:text-slate-950"
                         >
