@@ -122,7 +122,7 @@ export default function FormMotoCross() {
         const jsonData = JSON.stringify(dataToSend, null, 2);
         console.log(jsonData); // Exibe o JSON no console
 
-        // Simulação de envio para backend
+        // Simulação de envio para  backend
         alert('Pesquisa gerada (verifique o console para o JSON).');
 
         // Resetar o formulário após o envio
