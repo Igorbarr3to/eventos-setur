@@ -1,3 +1,5 @@
+'use client'
+
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
@@ -88,7 +90,6 @@ export default function FormMotoCross() {
         const dataToSend: Partial<SurveyFormData> = { ...data };
 
         // Limpa campos condicionais se não forem relevantes
-        // Estas exclusões garantem que o JSON final não contenha dados de campos irrelevantes
         if (dataToSend.veioOutraCidade !== 'Sim') {
             delete dataToSend.hospedagem;
             delete dataToSend.outroHospedagemText;
@@ -122,19 +123,14 @@ export default function FormMotoCross() {
         const jsonData = JSON.stringify(dataToSend, null, 2);
         console.log(jsonData); // Exibe o JSON no console
 
-        // Simulação de envio para  backend
         alert('Pesquisa gerada (verifique o console para o JSON).');
 
-        // Resetar o formulário após o envio
         form.reset();
     };
 
-    // Função auxiliar para limpar a resposta de uma pergunta específica
-    // Melhorando a tipagem para lidar com strings e valores literais
     const handleClearQuestion = (fieldName: keyof SurveyFormData) => {
         form.setValue(fieldName, '' as any, { shouldValidate: true });
 
-        // Limpa também o campo 'outro' associado, se houver
         if (fieldName === 'comoSoube') {
             form.setValue('outroComoSoubeText', '');
         } else if (fieldName === 'hospedagem') {
@@ -147,7 +143,7 @@ export default function FormMotoCross() {
     };
 
     return (
-        <div className="flex flex-col sm:p-6 lg:p-8">
+        <div className="sm:p-6 lg:p-8">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-2 py-4 bg-white rounded-lg shadow-md lg:mx-40">
                     {/* Pergunta 1: Perfil do respondente */}
@@ -164,7 +160,7 @@ export default function FormMotoCross() {
                                         size="sm"
                                         onClick={() => handleClearQuestion('perfil')}
                                     >
-                                        Limpar resposta 
+                                        Limpar resposta
                                     </Button>
                                 </div>
                                 <FormControl>
@@ -179,6 +175,7 @@ export default function FormMotoCross() {
                                             </FormControl>
                                             <FormLabel className="font-normal">Participante do evento</FormLabel>
                                         </FormItem>
+                                        {/* CORREÇÃO AQUI: Adicionado 'flex' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Morador da Região" className="border border-zinc-900" />
