@@ -85,11 +85,14 @@ export default function FormMotoCross() {
     }, [maiorImpacto, form]);
 
 
-    const onSubmit = (data: SurveyFormData) => {
-        // Cria uma cópia dos dados para manipulação antes de gerar o JSON
+    const onSubmit = async (data: SurveyFormData) => {
+        if (localStorage.getItem('formEnviado') === 'sim') {
+            alert('Você já respondeu à pesquisa.');
+            return;
+        }
+
         const dataToSend: Partial<SurveyFormData> = { ...data };
 
-        // Limpa campos condicionais se não forem relevantes
         if (dataToSend.veioOutraCidade !== 'Sim') {
             delete dataToSend.hospedagem;
             delete dataToSend.outroHospedagemText;
@@ -99,7 +102,6 @@ export default function FormMotoCross() {
             delete dataToSend.outroImpactoText;
         }
 
-        // Ajusta o valor dos campos "Outro" para o texto digitado e remove o campo auxiliar
         if (dataToSend.comoSoube === 'Outro') {
             dataToSend.comoSoube = dataToSend.outroComoSoubeText;
         }
@@ -120,12 +122,24 @@ export default function FormMotoCross() {
         }
         delete dataToSend.outroImpactoText;
 
-        const jsonData = JSON.stringify(dataToSend, null, 2);
-        console.log(jsonData); // Exibe o JSON no console
+        try {
+            const response = await fetch('/api/pesquisa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSend),
+            });
 
-        alert('Pesquisa gerada (verifique o console para o JSON).');
-
-        form.reset();
+            if (response.ok) {
+                alert('Resposta enviada com sucesso! Obrigado 🙂');
+                localStorage.setItem('formEnviado', 'sim');
+                form.reset();
+            } else {
+                alert('Ocorreu um erro ao enviar. Tente novamente.');
+            }
+        } catch (error) {
+            console.error('Erro ao enviar:', error);
+            alert('Erro de rede. Verifique sua conexão.');
+        }
     };
 
     const handleClearQuestion = (fieldName: keyof SurveyFormData) => {
