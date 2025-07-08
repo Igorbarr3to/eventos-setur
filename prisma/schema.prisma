@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,21 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Evento {
+  id        Int        @id @default(autoincrement()) // ID único para o evento
+  name      String      // Nome do evento (ex: "Campeonato Estadual de Motocross Rondoniense 2025")
+  date      DateTime // Data do evento
+  location  String // Local do evento
+  pesquisas Pesquisa[] // Relacionamento com a tabela de pesquisas
+}
+
 model Pesquisa {
-  id                  Int      @id @default(autoincrement())
-  perfil              String
-  comoSoube           String
-  veioOutraCidade     String
-  hospedagem          String
-  gasto               String
-  beneficiosEconomicos String
-  maiorImpacto        String
-  organizacao         String
-  acessibilidade      String
-  turismo             String
-  impactoAmbiental    String
-  sustentabilidade    String
-  visitaTuristica     String
-  recomendaria        String
-  dataHoraResposta    DateTime @default(now())
+  id                   Int      @id @default(autoincrement())
+  perfil               String // Perfil do respondente (ex: "Visitante", "Morador", "Comerciante" "Organizador")
+  comoSoube            String // Como o respondente soube do evento (ex: "Redes Sociais", "Amigos", "etc")
+  veioOutraCidade      String // Se o respondente veio de outra cidade (ex: "Sim", "Não")
+  hospedagem           String?  // Tipo de hospedagem (opcional, ex: "Hotel", "Airbnb")
+  gasto                String  // Gasto médio no evento (ex: "R$ 100,00 - R$300,00")
+  beneficiosEconomicos String  // Benefícios econômicos percebidos (ex: "Sim", "Não")
+  maiorImpacto         String  // Maior impacto percebido (ex: "Aumento do turismo", "Valorização cultural")
+  organizacao          String  // Avaliação da organização do evento (ex: "Excelente", "Boa", "Regular", "Ruim")
+  acessibilidade       String  // Se o respondente percebeu acessibilidade no evento (ex: "Sim", "Não")
+  turismo              String  // Se o respondente acha que o eventou ajudou no turismo local (ex: "Sim", "Não")
+  impactoAmbiental     String  // Avaliação do impacto ambiental (ex: "Sim", "Não")
+  sustentabilidade     String  // Avaliação da sustentabilidade do evento (ex: "Sim", "Não")
+  visitaTuristica      String  // Se o respondente visitou pontos turísticos (ex: "Sim", "Não")
+  recomendaria         String  // Se o respondente recomendaria o evento (ex: "Sim", "Não")
+  dataHoraResposta     DateTime @default(now()) // Data e hora da resposta
+
+  eventoId Int  // ID do evento relacionado
+  evento   Evento @relation(fields: [eventoId], references: [id], onDelete: Cascade) // Relacionamento com a tabela de eventos
 }

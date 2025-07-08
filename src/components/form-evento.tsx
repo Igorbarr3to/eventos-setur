@@ -1,14 +1,14 @@
 'use client'
 
 import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import type { SurveyFormData } from "@/types";
 import { useEffect } from "react";
 
-export default function FormMotoCross() {
+export default function FormEvento() {
     const form = useForm<SurveyFormData>({
         defaultValues: {
             perfil: '',
@@ -32,7 +32,6 @@ export default function FormMotoCross() {
         }
     });
 
-    // Observa mudanças nos campos condicionais para resetar valores
     const veioOutraCidade = form.watch("veioOutraCidade");
     const beneficiosEconomicos = form.watch("beneficiosEconomicos");
     const comoSoube = form.watch("comoSoube");
@@ -40,7 +39,6 @@ export default function FormMotoCross() {
     const gasto = form.watch("gasto");
     const maiorImpacto = form.watch("maiorImpacto");
 
-    // Lógica para limpar 'hospedagem' e 'outroHospedagemText' se 'veioOutraCidade' for 'Não'
     useEffect(() => {
         if (veioOutraCidade === 'Não') {
             form.setValue('hospedagem', '');
@@ -48,7 +46,6 @@ export default function FormMotoCross() {
         }
     }, [veioOutraCidade, form]);
 
-    // Lógica para limpar 'maiorImpacto' e 'outroImpactoText' se 'beneficiosEconomicos' não for 'Sim'
     useEffect(() => {
         if (beneficiosEconomicos !== 'Sim') {
             form.setValue('maiorImpacto', '');
@@ -56,28 +53,24 @@ export default function FormMotoCross() {
         }
     }, [beneficiosEconomicos, form]);
 
-    // Lógica para limpar 'outroComoSoubeText' se 'comoSoube' não for 'Outro'
     useEffect(() => {
         if (comoSoube !== 'Outro') {
             form.setValue('outroComoSoubeText', '');
         }
     }, [comoSoube, form]);
 
-    // Lógica para limpar 'outroHospedagemText' se 'hospedagem' não for 'Outro'
     useEffect(() => {
         if (hospedagem !== 'Outro') {
             form.setValue('outroHospedagemText', '');
         }
     }, [hospedagem, form]);
 
-    // Lógica para limpar 'outroGastoText' se 'gasto' não for 'Outro'
     useEffect(() => {
         if (gasto !== 'Outro') {
             form.setValue('outroGastoText', '');
         }
     }, [gasto, form]);
 
-    // Lógica para limpar 'outroImpactoText' se 'maiorImpacto' não for 'Outro'
     useEffect(() => {
         if (maiorImpacto !== 'Outro') {
             form.setValue('outroImpactoText', '');
@@ -86,6 +79,7 @@ export default function FormMotoCross() {
 
 
     const onSubmit = async (data: SurveyFormData) => {
+        // Exemplo de como você pode prevenir múltiplos envios, se for o caso
         if (localStorage.getItem('formEnviado') === 'sim') {
             alert('Você já respondeu à pesquisa.');
             return;
@@ -93,6 +87,7 @@ export default function FormMotoCross() {
 
         const dataToSend: Partial<SurveyFormData> = { ...data };
 
+        // Limpeza de campos condicionais
         if (dataToSend.veioOutraCidade !== 'Sim') {
             delete dataToSend.hospedagem;
             delete dataToSend.outroHospedagemText;
@@ -102,6 +97,7 @@ export default function FormMotoCross() {
             delete dataToSend.outroImpactoText;
         }
 
+        // Ajuste de campos "Outro"
         if (dataToSend.comoSoube === 'Outro') {
             dataToSend.comoSoube = dataToSend.outroComoSoubeText;
         }
@@ -122,7 +118,11 @@ export default function FormMotoCross() {
         }
         delete dataToSend.outroImpactoText;
 
+        const jsonData = JSON.stringify(dataToSend, null, 2);
+        console.log(jsonData); // Exibe o JSON no console
+
         try {
+            // TODO: Substitua '/api/pesquisa' pelo seu endpoint real de API
             const response = await fetch('/api/pesquisa', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -131,14 +131,16 @@ export default function FormMotoCross() {
 
             if (response.ok) {
                 alert('Resposta enviada com sucesso! Obrigado 🙂');
-                localStorage.setItem('formEnviado', 'sim');
-                form.reset();
+                localStorage.setItem('formEnviado', 'sim'); // Marca que o formulário foi enviado
+                form.reset(); // Limpa o formulário após o envio
             } else {
                 alert('Ocorreu um erro ao enviar. Tente novamente.');
+                // Em um cenário offline-first, aqui você salvaria no IndexedDB
             }
         } catch (error) {
             console.error('Erro ao enviar:', error);
             alert('Erro de rede. Verifique sua conexão.');
+            // Em um cenário offline-first, aqui você salvaria no IndexedDB
         }
     };
 
@@ -181,15 +183,15 @@ export default function FormMotoCross() {
                                     <RadioGroup
                                         onValueChange={field.onChange}
                                         value={field.value}
-                                        className="flex flex-col space-y-1"
+                                        className="flex flex-col space-y-1" // Opções em coluna
                                     >
-                                        <FormItem className="flex items-center space-x-3 space-y-0 ">
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' para rádio e label lado a lado */}
+                                        <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Participante do evento" />
                                             </FormControl>
                                             <FormLabel className="font-normal">Participante do evento</FormLabel>
                                         </FormItem>
-                                        {/* CORREÇÃO AQUI: Adicionado 'flex' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Morador da Região" className="border border-zinc-900" />
@@ -236,8 +238,9 @@ export default function FormMotoCross() {
                                     <RadioGroup
                                         onValueChange={field.onChange}
                                         value={field.value}
-                                        className="flex flex-col space-y-1"
+                                        className="flex flex-col space-y-1" // Opções em coluna
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Redes sociais" />
@@ -310,8 +313,9 @@ export default function FormMotoCross() {
                                     <RadioGroup
                                         onValueChange={field.onChange}
                                         value={field.value}
-                                        className="flex space-x-4"
+                                        className="flex space-x-4" // Opções lado a lado (row)
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Sim" />
@@ -352,8 +356,9 @@ export default function FormMotoCross() {
                                     <RadioGroup
                                         onValueChange={field.onChange}
                                         value={field.value}
-                                        className="flex flex-col space-y-1"
+                                        className="flex flex-col space-y-1" // Opções em coluna
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Hotel/Pousada" />
@@ -428,6 +433,7 @@ export default function FormMotoCross() {
                                         value={field.value}
                                         className="flex flex-col space-y-1"
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Menos de R$100" />
@@ -500,8 +506,9 @@ export default function FormMotoCross() {
                                     <RadioGroup
                                         onValueChange={field.onChange}
                                         value={field.value}
-                                        className="flex space-x-4"
+                                        className="flex space-x-4" // Opções lado a lado (row)
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Sim" />
@@ -548,8 +555,9 @@ export default function FormMotoCross() {
                                     <RadioGroup
                                         onValueChange={field.onChange}
                                         value={field.value}
-                                        className="flex flex-col space-y-1"
+                                        className="flex flex-col space-y-1" // Opções em coluna
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Aumento nas vendas do comércio local" />
@@ -624,6 +632,7 @@ export default function FormMotoCross() {
                                         value={field.value}
                                         className="flex flex-col space-y-1"
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Excelente" />
@@ -682,8 +691,9 @@ export default function FormMotoCross() {
                                     <RadioGroup
                                         onValueChange={field.onChange}
                                         value={field.value}
-                                        className="flex space-x-4"
+                                        className="flex space-x-4" // Opções lado a lado (row)
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Sim" />
@@ -732,6 +742,7 @@ export default function FormMotoCross() {
                                         value={field.value}
                                         className="flex space-x-4"
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Sim" />
@@ -780,6 +791,7 @@ export default function FormMotoCross() {
                                         value={field.value}
                                         className="flex space-x-4"
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Sim" />
@@ -822,6 +834,7 @@ export default function FormMotoCross() {
                                         value={field.value}
                                         className="flex space-x-4"
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Sim" />
@@ -870,6 +883,7 @@ export default function FormMotoCross() {
                                         value={field.value}
                                         className="flex space-x-4"
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Sim" />
@@ -912,6 +926,7 @@ export default function FormMotoCross() {
                                         value={field.value}
                                         className="flex space-x-4"
                                     >
+                                        {/* Todas as FormItem aqui precisam de 'flex items-center' */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="Sim" />
