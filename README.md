@@ -65,7 +65,6 @@ monitur/
 Antes de iniciar, certifique-se de ter instalado:
 
 - **📦 Node.js**: [Download Node.js](https://nodejs.org/) – Ambiente de execução JavaScript
-- **🐬 MySQL**: [Download MySQL](https://dev.mysql.com/downloads/) – Banco de dados relacional
 - **🧭 Prisma CLI** (instalado via npm): `npm install prisma --save-dev` – ORM para gerenciamento do banco
 - **🧰 Git**: [Download Git](https://git-scm.com/downloads) – Controle de versão
 
