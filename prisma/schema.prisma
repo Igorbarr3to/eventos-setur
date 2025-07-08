@@ -1,38 +1,142 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-model Evento {
-  id        Int        @id @default(autoincrement()) // ID único para o evento
-  name      String      // Nome do evento (ex: "Campeonato Estadual de Motocross Rondoniense 2025")
-  date      DateTime // Data do evento
-  location  String // Local do evento
-  pesquisas Pesquisa[] // Relacionamento com a tabela de pesquisas
+generator client {
+  provider = "prisma-client-js"
 }
 
+// Modelo para representar uma pesquisa
 model Pesquisa {
-  id                   Int      @id @default(autoincrement())
-  perfil               String // Perfil do respondente (ex: "Visitante", "Morador", "Comerciante" "Organizador")
-  comoSoube            String // Como o respondente soube do evento (ex: "Redes Sociais", "Amigos", "etc")
-  veioOutraCidade      String // Se o respondente veio de outra cidade (ex: "Sim", "Não")
-  hospedagem           String?  // Tipo de hospedagem (opcional, ex: "Hotel", "Airbnb")
-  gasto                String  // Gasto médio no evento (ex: "R$ 100,00 - R$300,00")
-  beneficiosEconomicos String  // Benefícios econômicos percebidos (ex: "Sim", "Não")
-  maiorImpacto         String  // Maior impacto percebido (ex: "Aumento do turismo", "Valorização cultural")
-  organizacao          String  // Avaliação da organização do evento (ex: "Excelente", "Boa", "Regular", "Ruim")
-  acessibilidade       String  // Se o respondente percebeu acessibilidade no evento (ex: "Sim", "Não")
-  turismo              String  // Se o respondente acha que o eventou ajudou no turismo local (ex: "Sim", "Não")
-  impactoAmbiental     String  // Avaliação do impacto ambiental (ex: "Sim", "Não")
-  sustentabilidade     String  // Avaliação da sustentabilidade do evento (ex: "Sim", "Não")
-  visitaTuristica      String  // Se o respondente visitou pontos turísticos (ex: "Sim", "Não")
-  recomendaria         String  // Se o respondente recomendaria o evento (ex: "Sim", "Não")
-  dataHoraResposta     DateTime @default(now()) // Data e hora da resposta
+  id             Int          @id @default(autoincrement())
+  tipo           PesquisaTipo @default(EVENTO)
+  titulo         String       @db.VarChar(255)
+  descricao      String?      @db.Text
+  localAplicacao String?      @map("local_aplicacao") @db.VarChar(255)
 
-  eventoId Int  // ID do evento relacionado
-  evento   Evento @relation(fields: [eventoId], references: [id], onDelete: Cascade) // Relacionamento com a tabela de eventos
+  // Campos específicos para tipo 'evento'
+  tituloProjeto        String?   @map("titulo_projeto") @db.VarChar(255)
+  objetivoGeral        String?   @map("objetivo_geral") @db.Text
+  objetivosEspecificos String?   @map("objetivos_especificos") @db.Text
+  justificativa        String?   @db.Text
+  publicoAlvo          String?   @map("publico_alvo") @db.Text
+  metodologia          String?   @db.Text
+  produtosEsperados    String?   @map("produtos_esperados") @db.Text
+  proponente           String?   @db.VarChar(255)
+  cnpjProponente       String?   @map("cnpj_proponente") @db.VarChar(20)
+  municipio            String?   @db.VarChar(100)
+  areaAbrangencia      String?   @map("area_abrangencia") @db.Text
+  processoSei          String?   @map("processo_sei") @db.VarChar(50)
+  valorTotal           Decimal?  @map("valor_total") @db.Decimal(12, 2)
+  fonteRecurso         String?   @map("fonte_recurso") @db.VarChar(255)
+  elementoDespesa      String?   @map("elemento_despesa") @db.VarChar(50)
+  dataInicio           DateTime? @map("data_inicio") @db.Date
+  dataFim              DateTime? @map("data_fim") @db.Date
+
+  status    PesquisaStatus @default(PLANEJADO)
+  createdBy Int?           @map("created_by") // Se você tiver um modelo User para vincular
+  // user                 User?           @relation(fields: [createdBy], references: [id])
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+
+  formularios Formulario[] // Uma Pesquisa pode ter vários Formulários
+  Resposta    Resposta[]
+
+  @@map("pesquisas")
+}
+
+enum PesquisaTipo {
+  EVENTO
+  GERAL
+}
+
+enum PesquisaStatus {
+  PLANEJADO
+  EM_ANDAMENTO
+  CONCLUIDO
+  CANCELADO
+}
+
+model Formulario {
+  id         Int            @id @default(autoincrement())
+  pesquisaId Int            @map("pesquisa_id")
+  pesquisa   Pesquisa       @relation(fields: [pesquisaId], references: [id], onDelete: Cascade)
+  nome       String         @db.VarChar(255)
+  tipo       FormularioTipo @default(PARTICIPANTE)
+  descricao  String?        @db.Text
+  ativo      Boolean        @default(true)
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
+
+  perguntas Pergunta[] // Um Formulário tem várias Perguntas
+  respostas Resposta[] // Um Formulário tem várias Respostas (cabeçalhos)
+
+  @@map("formularios")
+}
+
+enum FormularioTipo {
+  PARTICIPANTE
+  EXPOSITOR
+  ORGANIZADOR
+}
+
+model Pergunta {
+  id           Int          @id @default(autoincrement())
+  formularioId Int          @map("formulario_id")
+  formulario   Formulario   @relation(fields: [formularioId], references: [id], onDelete: Cascade)
+  texto        String       @db.Text
+  tipoResposta TipoResposta @map("tipo_resposta")
+  opcoesJson   Json?        @map("opcoes_json") // JSON para opções de múltipla escolha ou escala
+  obrigatoria  Boolean      @default(false)
+  ordem        Int? // Ordem da pergunta no formulário
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  respostasDetalhes RespostaDetalhe[] // Uma Pergunta pode ter muitos detalhes de Resposta
+
+  @@map("perguntas")
+}
+
+enum TipoResposta {
+  TEXTO
+  NUMERO
+  OPCAO // Para rádio buttons (uma única escolha)
+  MULTIPLA // Para checkboxes (múltiplas escolhas)
+  ESCALA
+  DATA
+}
+
+model Resposta {
+  id           Int        @id @default(autoincrement())
+  formularioId Int        @map("formulario_id")
+  formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
+  pesquisaId   Int        @map("pesquisa_id")
+  pesquisa     Pesquisa   @relation(fields: [pesquisaId], references: [id], onDelete: Cascade)
+  dataResposta DateTime   @default(now()) @map("data_resposta")
+  ip           String?    @db.Inet()
+  userAgent    String?    @map("user_agent") @db.Text
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  detalhes RespostaDetalhe[] // Uma Resposta tem muitos Detalhes de Resposta
+
+  @@map("respostas")
+}
+
+model RespostaDetalhe {
+  id         Int      @id @default(autoincrement())
+  respostaId Int      @map("resposta_id")
+  resposta   Resposta @relation(fields: [respostaId], references: [id], onDelete: Cascade)
+  perguntaId Int      @map("pergunta_id")
+  pergunta   Pergunta @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
+
+  valorTexto  String?   @map("valor_texto") @db.Text
+  valorNumero Decimal?  @map("valor_numero") @db.Decimal(10, 2)
+  valorData   DateTime? @map("valor_data") @db.Date
+  valorOpcao  String?   @map("valor_opcao") @db.VarChar(255) // Para opção selecionada ou valores de múltipla escolha (se for string concatenada)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("respostas_detalhes")
 }

@@ -1,20 +1,97 @@
-export interface SurveyFormData {
-  perfil: string;
-  comoSoube: string;
-  outroComoSoubeText?: string;
-  veioOutraCidade: 'Sim' | 'Não' | '';
-  hospedagem?: string;
-  outroHospedagemText?: string;
-  gasto: string;
-  outroGastoText?: string;
-  beneficiosEconomicos: 'Sim' | 'Não' | 'Não sei dizer' | '';
-  maiorImpacto?: string;
-  outroImpactoText?: string;
-  organizacao: 'Excelente' | 'Boa' | 'Regular' | 'Ruim' | 'Péssima' | '';
-  acessibilidade: 'Sim' | 'Parcialmente' | 'Não' | '';
-  turismo: 'Sim' | 'Não' | 'Não sei dizer' | '';
-  impactoAmbiental: 'Sim' | 'Não' | '';
-  sustentabilidade: 'Sim' | 'Não' | 'Não sei dizer' | '';
-  visitaTuristica: 'Sim' | 'Não' | '';
-  recomendaria: 'Sim' | 'Não' | '';
+// Tipos para dados que vêm do backend (definição da pesquisa e formulário)
+export enum PesquisaTipo {
+  EVENTO = 'EVENTO',
+  GERAL = 'GERAL',
+}
+
+// Enum para o status da pesquisa
+export enum PesquisaStatus {
+  PLANEJADO = 'PLANEJADO',
+  EM_ANDAMENTO = 'EM_ANDAMENTO',
+  CONCLUIDO = 'CONCLUIDO',
+  CANCELADO = 'CANCELADO',
+}
+
+// Enum para o tipo de formulário
+export enum FormularioTipo {
+  PARTICIPANTE = 'PARTICIPANTE',
+  EXPOSITOR = 'EXPOSITOR',
+  ORGANIZADOR = 'ORGANIZADOR',
+}
+
+// Enum para o tipo de resposta
+export enum TipoResposta {
+  TEXTO = 'TEXTO',
+  NUMERO = 'NUMERO',
+  OPCAO = 'OPCAO', // Para rádio buttons (uma única escolha)
+  MULTIPLA = 'MULTIPLA', // Para checkboxes (múltiplas escolhas)
+  ESCALA = 'ESCALA',
+  DATA = 'DATA',
+}
+
+export interface BackendPesquisa {
+  id: number;
+  titulo: string;
+  descricao?: string;
+  localAplicacao?: string;
+  tituloProjeto?: string;
+
+  // Campos específicos de evento/projeto (podem ser nulos se tipo for 'geral')
+  objetivoGeral?: string; 
+  objetivosEspecificos?: string; 
+  justificativa?: string; 
+  publicoAlvo?: string;
+  metodologia?: string; 
+  produtosEsperados?: string; 
+  proponente?: string; 
+  cnpjProponente?: string; 
+  municipio?: string; 
+  areaAbrangencia?: string; 
+  processoSei?: string; 
+  valorTotal?: number; 
+  fonteRecurso?: string; 
+  elementoDespesa?: string; 
+  dataInicio?: string; 
+  dataFim?: string; 
+
+  // Campos de status e metadados de auditoria
+  status?: PesquisaStatus; // 'planejado' | 'em_andamento' | 'concluido' | 'cancelado'
+}
+
+
+export interface BackendFormulario {
+  id: number;
+  nome: string;
+  tipo: FormularioTipo;
+  descricao?: string;
+  perguntas: BackendPergunta[]; // Inclui as perguntas do formulário
+}
+
+export interface BackendPergunta {
+  id: number;
+  texto: string;
+  tipoResposta: TipoResposta;
+  opcoesJson?: { value: string; label: string }[] | string[]; // Exemplo de estrutura para opções
+  obrigatoria: boolean;
+  ordem?: number;
+}
+
+// Tipagem para os dados do formulário que o usuário PREENCHE no frontend
+// Isso será um Record dinâmico, pois as chaves são os IDs das perguntas
+export type DynamicFormData = Record<number, string | number | string[] | null | undefined>;
+
+// Tipagem para os dados que serão ENVIADOS ao backend para Resposta e RespostaDetalhe
+export interface FrontendSubmissionData {
+  formularioId: number; // ID do formulário preenchido
+  pesquisaId: number;   // ID da pesquisa (evento) a que o formulário pertence
+  ip?: string; // Opcional, pode ser coletado no backend
+  userAgent?: string; // Opcional, pode ser coletado no backend
+  // Detalhes das respostas, mapeados para RespostaDetalhe
+  respostasDetalhes: {
+    perguntaId: number;
+    valorTexto?: string;
+    valorNumero?: number;
+    valorData?: string; // Ou Date, dependendo do parse
+    valorOpcao?: string; // Para rádio ou string concatenada de múltiplos
+  }[];
 }
