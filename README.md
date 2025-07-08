@@ -1,76 +1,126 @@
-# Formulário de Pesquisa Campeonato Estadual de Motocross Rondoniense 2025
+# 🛍️ MoniTUR – Sistema de Monitoramento de Pesquisas Turísticas
 
-Este projeto consiste em um formulário de pesquisa interativo desenvolvido para coletar feedback sobre o Campeonato Estadual de Motocross Rondoniense de 2025, um evento significativo na região de Rondônia. O formulário é projetado para ser usado por participantes, moradores da região, comerciantes locais e organizadores, coletando dados essenciais sobre a experiência, impacto e percepções do evento.
+## 📌 Descrição do Projeto
+**MoniTUR** é uma plataforma desenvolvida pela **Secretaria de Turismo de Rondônia (SETUR/RO)** com o objetivo de monitorar, mensurar e avaliar dados turísticos através de pesquisas aplicadas em diferentes contextos, como **eventos fomentados** e **locais fixos de visitação**.
+A aplicação permite a coleta de dados públicos e apresenta as informações em um dashboard dinâmico, estatístico e de fácil visualização, facilitando a tomada de decisões baseadas em dados e fortalecendo a política pública do turismo Rondoniense.
 
-## Descrição do Projeto
+---
 
-O objetivo principal é fornecer uma ferramenta eficiente e moderna para a SETUR (Secretaria de Estado do Turismo) coletar informações valiosas para o planejamento de futuras edições do campeonato. O formulário captura dados sobre como os respondentes souberam do evento, seus gastos aproximados, a percepção sobre os benefícios econômicos gerados, avaliação da organização, acessibilidade, contribuição para o turismo local e impacto ambiental, além da probabilidade de recomendação.
+## 🛠️ Tecnologias Utilizadas
+O projeto **MoniTUR** foi desenvolvido com foco em estrutura robusta, facilidade de uso e expansão futura.
 
-## Funcionalidades Principais
+| Camada              | Tecnologia                 | Descrição                             |
+|---------------------|----------------------------|---------------------------------------|
+| Backend             | Next.js API Routes         | Rotas RESTful integradas              |
+| ORM                 | Prisma                     | Mapeamento objeto-relacional          |
+| Frontend            | Next.js + React            | SPA com SSR e rotas dinâmicas         |
+| Autenticação        | NextAuth.js                | Login seguro com JWT                  |
+| Permissões          | Middleware custom          | Controle de acesso por papéis         |
+| Banco de Dados      | Postgres                   | Relacional, compatível com Prisma     |
+| Estilo              | Tailwind CSS               | Estilização moderna e responsiva      |
+| Gráficos            | Chart.js / ApexCharts      | Visualização de dados                 |
 
-* **Coleta de Dados Abrangente:** Questionário detalhado para diversos perfis de respondentes.
-* **Controles de Formulário Modernos:** Utilização de `RadioGroup` e `Input` do `shadcn/ui` para uma interface intuitiva.
-* **Gerenciamento de Estado Otimizado:** Implementado com `react-hook-form` para um controle de formulário eficiente e validação simplificada.
-* **Lógica de Limpeza de Dados Inteligente:** Embora todos os campos sejam visíveis, o formulário garante que os dados JSON enviados sejam limpos de informações irrelevantes com base nas respostas condicionais (ex: campos de hospedagem são resetados se o participante não veio de outra cidade).
-* **Botão "Limpar Resposta" por Pergunta:** Oferece flexibilidade ao usuário para redefinir respostas individuais sem afetar o restante do formulário.
-* **Geração de JSON para Backend:** As respostas são formatadas em um objeto JSON estruturado e exibidas no console do navegador, prontas para serem integradas a qualquer API de backend para persistência de dados.
-* **Design Responsivo:** Utiliza Tailwind CSS para garantir uma experiência de usuário consistente em diferentes dispositivos e tamanhos de tela.
+---
 
-## Tecnologias Utilizadas
+# 🌟 Funcionalidades
+- 🗓️ Cadastro e gerenciamento de pesquisas turísticas
+- 📝 Criação de formulários dinâmicos com perguntas customizadas
+- 👥 Coleta de dados de três públicos:
+  - Participantes
+  - Expositores e vendedores
+  - Organizadores
+- 📊 Dashboard com gráficos e métricas em tempo real
+- 📄 Exportação de dados em CSV e Excel
+- 👤 Controle de usuários e permissões por papel
+- 🔒 Autenticação segura com NextAuth
 
-O projeto é construído sobre uma pilha de tecnologias modernas para desenvolvimento frontend:
+## 📂 Estrutura do Projeto
 
-* **React.js:** Biblioteca JavaScript para construção de interfaces de usuário declarativas e baseadas em componentes.
-* **TypeScript:** Superset do JavaScript que adiciona tipagem estática, aumentando a segurança do código e a experiência do desenvolvedor.
-* **React Hook Form:** Uma biblioteca performática e flexível para gerenciamento de formulários no React, com foco em simplicidade e validação eficiente.
-* **Shadcn/ui:** Uma coleção de componentes de interface de usuário reutilizáveis e acessíveis, estilizados com Tailwind CSS e construídos sobre Radix UI Primitives.
-* **Tailwind CSS:** Um framework CSS utility-first que permite construir designs personalizados rapidamente, sem sair do seu HTML (JSX).
-* **Vite:** Um bundler frontend de próxima geração que oferece um ambiente de desenvolvimento extremamente rápido e otimizado para produção.
+```
+monitur/
+├── prisma/               # 🧬 Esquema e migrações do banco de dados (Prisma)
+│   ├── schema.prisma     # 📐 Definição das tabelas e relações
+│   └── migrations/       # 🗄️ Histórico de alterações no banco
+├── src/                  # 🧠 Código-fonte principal da aplicação
+│   ├── app/              # 🚀 Código-fonte principal da aplicação para o App Router
+│   │   ├── api/          # 🔌 Rotas da API (Route Handlers)
+│   │   ├── layout.tsx    # 🖼️ Layouts globais e por segmento de rota
+│   │   ├── page.tsx      # 🏠 Página inicial da aplicação (root route)
+│   │   ├── globals.css   # 🎨 Estilos globais (inclui Tailwind CSS imports)
+│   │   └── favicon.ico   # 🌐 Favicon
+│   ├── components/       # 🧩 Componentes React reutilizáveis (Client Components e Server Components)
+│   │   └── ui/           # Componentes Shadcn/ui
+│   ├── lib/              # 🧰 Funções auxiliares (PrismaClient, helpers de autenticação, etc.)
+│   └── types/            # 📚 Tipagens TypeScript compartilhadas (interfaces, etc.)
+├── public/               # 🌐 Arquivos estáticos (imagens, manifest.json para PWA, etc.)
+├── middleware.ts         # 🛡️ Middlewares de autenticação e autorização (no nível da raiz do projeto)
+├── .env                  # ⚙️ Variáveis de ambiente
+├── package.json          # 📦 Dependências e scripts do projeto
+├── tsconfig.json         # 🧠 Configuração do TypeScript
+└── README.md             # 📘 Documentação do projeto
+```
+---
 
-## Como Executar o Projeto
+## 📅 Requisitos de Instalação
+Antes de iniciar, certifique-se de ter instalado:
 
-Siga estas instruções para configurar e rodar o projeto em seu ambiente de desenvolvimento local.
+- **📦 Node.js**: [Download Node.js](https://nodejs.org/) – Ambiente de execução JavaScript
+- **🐬 MySQL**: [Download MySQL](https://dev.mysql.com/downloads/) – Banco de dados relacional
+- **🧭 Prisma CLI** (instalado via npm): `npm install prisma --save-dev` – ORM para gerenciamento do banco
+- **🧰 Git**: [Download Git](https://git-scm.com/downloads) – Controle de versão
 
-### Pré-requisitos
+---
 
-Certifique-se de ter os seguintes softwares instalados em sua máquina:
+## 🧭 Arquitetura e Padrão de Projeto
+O projeto **MoniTUR** adota uma arquitetura moderna baseada em **Next.js com API Routes**, estruturada de forma modular e orientada a domínios. A organização do código segue os princípios de **separação de responsabilidades**, **alta coesão** e **baixo acoplamento**, facilitando a escalabilidade e a manutenção do sistema.
 
-* [**Node.js**](https://nodejs.org/en/download/) (versão LTS recomendada)
-* [**npm**](https://www.npmjs.com/get-npm) (vem junto com o Node.js) ou [**Yarn**](https://yarnpkg.com/getting-started/install)
+### 🔹 Padrões e práticas adotadas:
+- **Arquitetura Modular por Domínio**: cada funcionalidade (pesquisas, formulários, respostas) possui sua própria estrutura de rotas, lógica e componentes.
+- **Camadas bem definidas**:
+  - `pages/` e `components/` para a camada de apresentação
+  - `lib/` e `middleware/` para lógica de negócio e segurança
+  - `prisma/` para persistência de dados
+- **Prisma ORM**: abstração de banco de dados com tipagem forte e migrações controladas
+- **NextAuth.js**: autenticação segura com suporte a JWT e controle de sessão
+- **Middlewares personalizados**: controle de permissões baseado em papéis (`admin`, `analista`, `avaliador`)
+- **Componentização reutilizável**: UI construída com React e Tailwind CSS, promovendo reutilização e consistência visual
 
-### Instalação
+Essa arquitetura permite que o sistema cresça de forma organizada, com facilidade para adicionar novas funcionalidades, manter segurança e garantir performance.
 
-1.  **Clone o Repositório:**
-    Abra seu terminal (ou Git Bash) e execute o comando para clonar o projeto:
-    ```bash
-    git clone https://github.com/Igorbarr3to/form-evento-motocross-setur.git
-    ```
+---
 
-2.  **Navegue até o Diretório do Projeto:**
-    Após clonar, entre na pasta do projeto:
-    ```bash
-    cd form-evento-motocross-setur
-    ```
+## 🔗 Endpoints REST (exemplos)
 
-3.  **Instale as Dependências:**
-    Execute o comando para instalar todas as dependências do projeto:
-    ```bash
-    npm install
-    # Ou, se estiver usando Yarn:
-    # yarn install
-    ```
-    *Se você encontrar problemas com os componentes do shadcn/ui ou react-hook-form, certifique-se de que foram adicionados corretamente seguindo a documentação oficial ou execute:*
-    ```bash
-    npm install react-hook-form zod
-    npx shadcn-ui@latest add form radio-group input button
-    # E quaisquer outros componentes shadcn/ui que estejam faltando.
-    ```
+| Método | Endpoint                              | Descrição                                          |
+|--------|---------------------------------------|----------------------------------------------------|
+| GET    | `/api/pesquisas`                      | Lista todas as pesquisas cadastradas               |
+| POST   | `/api/pesquisas`                      | Cria uma nova pesquisa                             |
+| GET    | `/api/formularios/{id}`               | Exibe um formulário específico                     |
+| POST   | `/api/formularios`                    | Cria um novo formulário vinculado a uma pesquisa   |
+| GET    | `/api/perguntas/{formulario_id}`      | Lista perguntas de um formulário                   |
+| POST   | `/api/perguntas`                      | Cria uma nova pergunta                             |
+| POST   | `/api/respostas`                      | Registra uma resposta de um usuário                |
+| GET    | `/api/respostas/{pesquisa_id}`        | Lista respostas por pesquisa                       |
+| GET    | `/api/dashboard/{pesquisa_id}`        | Retorna indicadores e métricas da pesquisa         |
+| POST   | `/api/auth/login`                     | Realiza login do usuário                           |
+| GET    | `/api/auth/session`                   | Retorna sessão autenticada                         |
+| POST   | `/api/auth/logout`                    | Encerra a sessão do usuário                        |
+| GET    | `/api/usuarios`                       | Lista usuários (admin)                             |
+| POST   | `/api/usuarios`                       | Cria novo usuário                                  |
+| PATCH  | `/api/usuarios/{id}/papel`            | Atualiza o papel de um usuário                     |
 
-### Rodando o Servidor de Desenvolvimento
+---
 
-Para iniciar o aplicativo em modo de desenvolvimento:
+## 🧱 Estrutura do Banco de Dados
 
-```bash
-npm run dev
-# Ou, se estiver usando Yarn:
-# yarn dev
+Tabelas baseadas no padrão **Data First**, conforme SQL fornecido:
+
+- `usuarios`
+- `pesquisas`
+- `formularios`
+- `perguntas`
+- `respostas`
+- `respostas_detalhes`
+
+---
+
