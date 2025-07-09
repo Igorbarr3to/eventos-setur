@@ -1,9 +1,7 @@
-// src/app/api/admin/formularios/route.ts
-import { PrismaClient, FormularioTipo } from '@prisma/client';
+import { FormularioTipo } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // Esquema Zod para validar os dados ao criar um novo Formulário
 const createFormularioSchema = z.object({
@@ -45,8 +43,6 @@ export async function POST(request: NextRequest) {
         }
         console.error('Erro ao criar Formulário:', error);
         return NextResponse.json({ message: 'Erro interno do servidor ao criar Formulário.' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 }
 
@@ -70,7 +66,5 @@ export async function GET(request: NextRequest) {
     } catch (error) {
         console.error('Erro ao buscar Formulários:', error);
         return NextResponse.json({ message: 'Erro ao buscar Formulários.' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 }

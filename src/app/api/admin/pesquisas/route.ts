@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -19,7 +19,7 @@ const createPesquisaSchema = z.object({
     cnpjProponente: z.string().optional(),
     municipio: z.string().optional(),
     areaAbrangencia: z.string().optional(),
-    processo_sei: z.string().optional(), 
+    processoSei: z.string().optional(), 
     valorTotal: z.number().optional(),
     fonteRecurso: z.string().optional(),
     elementoDespesa: z.string().optional(),
@@ -28,8 +28,6 @@ const createPesquisaSchema = z.object({
     status: z.enum(['PLANEJADO', 'EM_ANDAMENTO', 'CONCLUIDO', 'CANCELADO']).default('PLANEJADO'),
     createdBy: z.number().optional(), // Se você tiver autenticação de usuário
 });
-
-const prisma = new PrismaClient();
 
 // Endpoint para criar uma nova Pesquisa (Evento/Projeto)
 export async function POST(request: NextRequest) {
@@ -53,8 +51,6 @@ export async function POST(request: NextRequest) {
         }
         console.error('Erro ao criar pesquisa:', error);
         return NextResponse.json({ message: 'Erro ao criar pesquisa' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 }
 
@@ -81,7 +77,5 @@ export async function GET() {
     } catch (error) {
         console.error('Erro ao buscar pesquisas:', error);
         return NextResponse.json({ message: 'Erro ao buscar pesquisas' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 }

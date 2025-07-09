@@ -1,8 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 // Endpoint para listar Pesquisas (Eventos/Projetos)
 export async function GET() {
@@ -27,7 +24,5 @@ export async function GET() {
     } catch (error) {
         console.error('Erro ao buscar pesquisas:', error);
         return NextResponse.json({ message: 'Erro ao buscar pesquisas' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
-    }
+    } 
 }

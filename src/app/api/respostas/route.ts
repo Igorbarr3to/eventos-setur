@@ -1,10 +1,8 @@
 // app/api/respostas/route.ts
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { TipoResposta } from '@/types'; 
-
-const prisma = new PrismaClient();
 
 // Zod Schema para validar os detalhes de uma resposta individual
 const respostaDetalheSchema = z.object({
@@ -12,7 +10,7 @@ const respostaDetalheSchema = z.object({
     valorTexto: z.string().optional().nullable(),
     valorNumero: z.number().optional().nullable(),
     valorData: z.string().datetime().optional().nullable(), // Espera ISO string
-    valorOpcao: z.string().optional().nullable(), // Para rádio ou múltiplos como string
+    valorOpcao: z.string().optional().nullable(), // Para radio ou múltiplos como string
 });
 
 // Zod Schema para a submissão completa do formulário
@@ -100,7 +98,5 @@ export async function POST(request: NextRequest) {
         }
         console.error('Erro ao salvar resposta:', error);
         return NextResponse.json({ message: 'Erro ao salvar resposta' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 }

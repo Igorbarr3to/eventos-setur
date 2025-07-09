@@ -1,9 +1,8 @@
-// src/app/api/admin/perguntas/route.ts
-import { PrismaClient, TipoResposta } from '@prisma/client';
+import { TipoResposta } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-const prisma = new PrismaClient();
 
 // Esquema Zod para validar os dados ao criar uma nova Pergunta
 const createPerguntaSchema = z.object({
@@ -47,8 +46,6 @@ export async function POST(request: NextRequest) {
         }
         console.error('Erro ao criar Pergunta:', error);
         return NextResponse.json({ message: 'Erro interno do servidor ao criar Pergunta.' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 }
 
@@ -79,7 +76,5 @@ export async function GET(request: NextRequest) {
         }
         console.error('Erro ao buscar Perguntas:', error);
         return NextResponse.json({ message: 'Erro ao buscar Perguntas.' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 }

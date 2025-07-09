@@ -100,7 +100,7 @@ model Pergunta {
 enum TipoResposta {
   TEXTO
   NUMERO
-  OPCAO // Para rádio buttons (uma única escolha)
+  OPCAO // Para radio buttons (uma única escolha)
   MULTIPLA // Para checkboxes (múltiplas escolhas)
   ESCALA
   DATA
