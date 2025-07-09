@@ -9,7 +9,7 @@ export const prisma =
 function createPrismaInstance() {
   console.log('✅ [PRISMA] Nova instância do PrismaClient criada.'); // Mensagem de criação
   return new PrismaClient({
-    log: ['query'], // Descomente para ver as queries no console
+    log: ['query'],
   });
 }
 

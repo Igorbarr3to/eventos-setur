@@ -5,7 +5,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { SurveyFormData } from "@/types";
+import type { SurveyFormData } from "../../types/types";
 import { useEffect } from "react";
 
 export default function FormEvento() {

@@ -2,8 +2,29 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 generator client {
   provider = "prisma-client-js"
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String? // Para guardar a senha com hash
+  role          UserRole  @default(USER) // Essencial para autorização
+
+  // Relação com as pesquisas que o usuário criou
+  pesquisasCriadas Pesquisa[] @relation("CreatedBy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
 
 // Modelo para representar uma pesquisa
@@ -34,8 +55,8 @@ model Pesquisa {
   dataFim              DateTime? @map("data_fim") @db.Date
 
   status    PesquisaStatus @default(PLANEJADO)
-  createdBy Int?           @map("created_by") // Se você tiver um modelo User para vincular
-  // user                 User?           @relation(fields: [createdBy], references: [id])
+  createdBy Int?           @map("created_by")
+  creator   User?          @relation("CreatedBy", fields: [createdBy], references: [id])
   createdAt DateTime       @default(now()) @map("created_at")
   updatedAt DateTime       @updatedAt @map("updated_at")
 
