@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 // Zod Schema para criar/validar uma nova Pesquisa (Evento/Projeto)
 const createPesquisaSchema = z.object({
@@ -19,7 +21,7 @@ const createPesquisaSchema = z.object({
     cnpjProponente: z.string().optional(),
     municipio: z.string().optional(),
     areaAbrangencia: z.string().optional(),
-    processoSei: z.string().optional(), 
+    processoSei: z.string().optional(),
     valorTotal: z.number().optional(),
     fonteRecurso: z.string().optional(),
     elementoDespesa: z.string().optional(),
@@ -31,7 +33,12 @@ const createPesquisaSchema = z.object({
 
 // Endpoint para criar uma nova Pesquisa (Evento/Projeto)
 export async function POST(request: NextRequest) {
-    //TODO: adicionar autenticação e autorização de administrador
+    const session = await getServerSession(authOptions);
+
+    if (!session || session.user?.role !== 'ADMIN') {
+        return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+    }
+
     try {
         const json = await request.json();
         const data = createPesquisaSchema.parse(json);
@@ -56,6 +63,12 @@ export async function POST(request: NextRequest) {
 
 // Endpoint para listar Pesquisas (Eventos/Projetos)
 export async function GET() {
+    const session = await getServerSession(authOptions);
+    
+    if (!session || session.user?.role !== 'ADMIN') {
+        return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+    }
+
     try {
         const pesquisas = await prisma.pesquisa.findMany({
             orderBy: {

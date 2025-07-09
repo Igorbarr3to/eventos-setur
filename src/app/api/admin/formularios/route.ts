@@ -2,6 +2,8 @@ import { FormularioTipo } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 // Esquema Zod para validar os dados ao criar um novo Formulário
 const createFormularioSchema = z.object({
@@ -14,12 +16,17 @@ const createFormularioSchema = z.object({
 
 // Handler para criar uma nova definição de Formulário
 export async function POST(request: NextRequest) {
-    // TODO: Adicionar lógica de autenticação/autorização de administrador aqui!
+    const session = await getServerSession(authOptions);
+
+    if (!session || session.user?.role !== 'ADMIN') {
+        return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+    }
+    
     try {
         const json = await request.json();
         const data = createFormularioSchema.parse(json);
 
-        // Opcional: Verificar se a pesquisaId existe
+        //Verificar se a pesquisaId existe
         const pesquisaExists = await prisma.pesquisa.findUnique({ where: { id: data.pesquisaId } });
         if (!pesquisaExists) {
             return NextResponse.json({ message: 'Pesquisa (evento) com o ID fornecido não encontrada.' }, { status: 404 });
@@ -48,7 +55,12 @@ export async function POST(request: NextRequest) {
 
 // Handler para listar Formulários 
 export async function GET(request: NextRequest) {
-    // TODO: Adicionar lógica de autenticação/autorização de administrador aqui!
+    const session = await getServerSession(authOptions);
+
+    if (!session || session.user?.role !== 'ADMIN') {
+        return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const pesquisaId = searchParams.get('pesquisaId'); // Permite filtrar por pesquisaId
 

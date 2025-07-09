@@ -2,6 +2,8 @@ import { TipoResposta } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 
 // Esquema Zod para validar os dados ao criar uma nova Pergunta
@@ -16,7 +18,12 @@ const createPerguntaSchema = z.object({
 
 // Handler para criar uma nova definição de Pergunta
 export async function POST(request: NextRequest) {
-    // TODO: Adicionar lógica de autenticação/autorização de administrador aqui!
+    const session = await getServerSession(authOptions);
+
+    if (!session || session.user?.role !== 'ADMIN') {
+        return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+    }
+    
     try {
         const json = await request.json();
         const data = createPerguntaSchema.parse(json);
@@ -51,7 +58,12 @@ export async function POST(request: NextRequest) {
 
 // Handler para listar Perguntas
 export async function GET(request: NextRequest) {
-    // TODO: Adicionar lógica de autenticação/autorização de administrador aqui!
+    const session = await getServerSession(authOptions);
+
+    if (!session || session.user?.role !== 'ADMIN') {
+        return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const formularioId = searchParams.get('formularioId');
 
