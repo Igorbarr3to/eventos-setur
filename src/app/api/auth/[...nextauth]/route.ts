@@ -18,6 +18,9 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+
+        console.log("--- FUNÇÃO AUTHORIZE ACIONADA ---");
+        console.log("Credenciais recebidas:", credentials);
         if (!credentials?.email || !credentials?.password) return null;
 
         const user = await prisma.user.findUnique({
