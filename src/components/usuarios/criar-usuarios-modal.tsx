@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface FormValues {
     name: string;
@@ -63,6 +64,7 @@ export default function CriarUsuariosModal({ onUserCreated }: CriarUsuariosModal
             }
 
             setOpen(false);
+            toast.success('Usuário criado com sucesso!', {position: 'top-center'} )
             form.reset();
             onUserCreated?.();
 

@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Edit } from "lucide-react";
+import { toast } from "sonner";
 
 type SafeUser = Omit<User, 'password' | 'emailVerified'>;
 
@@ -55,6 +56,7 @@ export default function EditarUsuarioModal({ user, onUserUpdated }: EditarUsuari
             }
 
             setOpen(false);
+            toast.success('Usuário atualizado com sucesso!', {position: 'top-center'} )
             onUserUpdated();
 
         } catch (error: any) {

@@ -13,6 +13,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface DeletarUsuarioBotaoProps {
     userId: number;
@@ -35,7 +36,7 @@ export function DeletarUsuarioModal({ userId, onUserDeleted }: DeletarUsuarioBot
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Falha ao excluir usuário.");
             }
-            
+            toast.success('Usuário excluído com sucesso!', {position: 'top-center'})
             onUserDeleted();
         } catch (err: any) {
             setError(err.message);
