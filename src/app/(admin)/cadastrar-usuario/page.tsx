@@ -40,6 +40,7 @@ export default function UsuariosPage() {
             </div>
             <CadastrarUsuarioPage
                 users={users}
+                onUserListChange={fetchUsers}
                 isLoading={isLoading}
             />
         </div>
