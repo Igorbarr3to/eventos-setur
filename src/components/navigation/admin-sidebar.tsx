@@ -25,7 +25,7 @@ export async function AppSidebar() {
             <SidebarHeader className="text-center text-2xl font-bold">
                 MoniTUR
             </SidebarHeader>
-            <SidebarContent className="bg-blue-500 text-white">
+            <SidebarContent className="">
                 <SidebarGroup>
                     <SidebarGroupContent >
                         <SidebarMenu className="space-y-2">
@@ -36,13 +36,13 @@ export async function AppSidebar() {
                                 </a>
                             </SidebarMenuButton>
                             <SidebarMenuButton>
-                                <a href="/cadastrar-usuario" className="flex items-center gap-2">
+                                <a href="/usuarios  " className="flex items-center gap-2">
                                     <User2Icon size={20}/>
-                                    <span className="text-lg">Cadastrar usuário</span>
+                                    <span className="text-lg">Usuários</span>
                                 </a>
                             </SidebarMenuButton>
                             <SidebarMenuButton>
-                                <a href="#" className="flex items-center gap-2">
+                                <a href="/pesquisas" className="flex items-center gap-2">
                                     <SearchIcon size={20}/>
                                     <span className="text-lg">Pesquisas</span>
                                 </a>

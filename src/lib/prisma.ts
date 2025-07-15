@@ -7,7 +7,6 @@ export const prisma =
   globalForPrisma.prisma || createPrismaInstance();
 
 function createPrismaInstance() {
-  console.log('✅ [PRISMA] Nova instância do PrismaClient criada.'); // Mensagem de criação
   return new PrismaClient({
     log: ['query'],
   });
@@ -17,6 +16,6 @@ if (process.env.NODE_ENV !== 'production') {
   if (!globalForPrisma.prisma) {
     globalForPrisma.prisma = prisma;
   } else {
-    console.log('🔄 [PRISMA] Reutilizando instância existente do PrismaClient (Hot Reload).'); // Mensagem de reutilização
+    
   }
 }
