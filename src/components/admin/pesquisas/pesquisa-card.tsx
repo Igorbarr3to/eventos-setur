@@ -49,7 +49,7 @@ export function PesquisaCard({ pesquisa, onListChange }: PesquisaCardProps) {
         )}
       </CardContent>
       <CardFooter className="flex justify-between gap-2 p-4 mt-4">
-        <Link href={`/admin/pesquisas/${pesquisa.id}`}>
+        <Link href={`/pesquisas/${pesquisa.id}`}>
           <Button className="bg-gray-400 border ">
             Gerenciar
           </Button>

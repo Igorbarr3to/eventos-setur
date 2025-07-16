@@ -158,7 +158,7 @@ export function EditarPesquisaModal({ pesquisa, onPesquisaEditada }: EditarPesqu
                             <FormControl>
                               <SelectTrigger><SelectValue /></SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-white">
                               <SelectItem value={PesquisaTipo.EVENTO}>Evento</SelectItem>
                               <SelectItem value={PesquisaTipo.GERAL}>Geral</SelectItem>
                             </SelectContent>
@@ -177,7 +177,7 @@ export function EditarPesquisaModal({ pesquisa, onPesquisaEditada }: EditarPesqu
                             <FormControl>
                               <SelectTrigger><SelectValue /></SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-white">
                               <SelectItem value={PesquisaStatus.PLANEJADO}>Planejado</SelectItem>
                               <SelectItem value={PesquisaStatus.EM_ANDAMENTO}>Em Andamento</SelectItem>
                               <SelectItem value={PesquisaStatus.CONCLUIDO}>Concluído</SelectItem>
