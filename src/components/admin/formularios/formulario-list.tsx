@@ -1,14 +1,14 @@
 'use client';
 
-import { Formulario, Pesquisa } from "@prisma/client";
+import { Formulario } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from "next/link";
-import { FileText } from "lucide-react";
+import { FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { CriarFormularioModal } from "./criar-formulario-modal";
 import { DeletarFormularioBotao } from "./deletar-formulario-modal";
 import { EditarFormularioModal } from "./editar-formulario-modal";
+import { PerguntasList } from "../perguntas/perguntas-list";
 
 interface FormulariosListProps {
     pesquisaId: number;
@@ -17,6 +17,8 @@ interface FormulariosListProps {
 export function FormulariosList({ pesquisaId }: FormulariosListProps) {
     const [formularios, setFormularios] = useState<Formulario[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    // 2. Estado para controlar qual card está expandido
+    const [expandedFormId, setExpandedFormId] = useState<number | null>(null);
 
     const refetchFormularios = async () => {
         setIsLoading(true);
@@ -36,6 +38,11 @@ export function FormulariosList({ pesquisaId }: FormulariosListProps) {
     useEffect(() => {
         refetchFormularios();
     }, [pesquisaId]);
+
+    // Função para alternar a exibição da seção de perguntas
+    const toggleExpand = (formId: number) => {
+        setExpandedFormId(prevId => (prevId === formId ? null : formId));
+    };
 
     return (
         <div className="space-y-4">
@@ -60,31 +67,34 @@ export function FormulariosList({ pesquisaId }: FormulariosListProps) {
             {!isLoading && formularios.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {formularios.map(form => (
-                        <Card key={form.id} className="bg-white">
-                            <CardHeader>
-                                <CardTitle>{form.nome}</CardTitle>
-                                <CardDescription>{form.descricao || 'Sem descrição'}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-muted-foreground">Tipo: {form.tipo}</p>
-                            </CardContent>
-                            <CardFooter className="border-t gap-2">
+                        <div key={form.id}>
+                            <Card className={`w-[400px] bg-white transition-all ${expandedFormId === form.id ? 'rounded-b-lg' : ''}`}>
+                                <CardHeader>
+                                    <CardTitle>{form.nome}</CardTitle>
+                                    <CardDescription>{form.descricao || 'Sem descrição'}</CardDescription>
+                                </CardHeader>
+                                <CardContent className="flex  justify-between">
+                                    <p className="text-sm text-muted-foreground">Tipo: {form.tipo}</p>
+                                    <div className="flex gap-2">
+                                        <EditarFormularioModal formulario={form} onFormularioEditado={refetchFormularios} />
+                                        <DeletarFormularioBotao formularioId={form.id} onFormularioDeleted={refetchFormularios} />
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="flex flex-col justify-between items-center border-t pt-4">
+                                    {/* 3. Botão para expandir/recolher */}
+                                    <Button variant="ghost" onClick={() => toggleExpand(form.id)}>
+                                        {expandedFormId === form.id ? <ChevronUp className="mr-2 h-4 w-4" /> : <ChevronDown className="mr-2 h-4 w-4" />}
+                                        Perguntas
+                                    </Button>
 
-                                {/* O link para gerenciar as perguntas será adicionado depois */}
-                                <Button asChild className="border bg-blue-600/40">
-                                    <Link href="#">Gerenciar Perguntas</Link>
-                                </Button>
-
-                                <EditarFormularioModal
-                                    formulario={form}
-                                    onFormularioEditado={refetchFormularios}
-                                />
-                                <DeletarFormularioBotao
-                                    formularioId={form.id}
-                                    onFormularioDeleted={refetchFormularios}
-                                />
-                            </CardFooter>
-                        </Card>
+                                    {expandedFormId === form.id && (
+                                        <div className="">
+                                            <PerguntasList formularioId={form.id} />
+                                        </div>
+                                    )}
+                                </CardFooter>
+                            </Card>
+                        </div>
                     ))}
                 </div>
             )}

@@ -1,92 +1,66 @@
-import { TipoResposta } from '@prisma/client';
-import { prisma } from '@/lib/prisma';
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
+// app/api/admin/perguntas/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { TipoResposta } from "@prisma/client";
 
-
-// Esquema Zod para validar os dados ao criar uma nova Pergunta
 const createPerguntaSchema = z.object({
-    formularioId: z.number().int('ID do formulário deve ser um número inteiro.').min(1, 'ID do formulário é obrigatório.'),
-    texto: z.string().min(1, 'O texto da pergunta é obrigatório.'),
-    tipoResposta: z.nativeEnum(TipoResposta), // Usa o enum nativo do Prisma
-    opcoesJson: z.array(z.string()).optional().nullable(),
-    obrigatoria: z.boolean().default(false),
-    ordem: z.number().int().optional().nullable(), // Ordem da pergunta no formulário
+  formularioId: z.number().int(),
+  texto: z.string().min(1, "O texto da pergunta é obrigatório."),
+  tipoResposta: z.nativeEnum(TipoResposta),
+  obrigatoria: z.boolean().default(false),
+  opcoesJson: z.any().optional().nullable(), // Aceita qualquer estrutura JSON
+  ordem: z.number().int().optional(),
 });
 
-// Handler para criar uma nova definição de Pergunta
 export async function POST(request: NextRequest) {
-    const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== 'ADMIN') {
+    return NextResponse.json({ message: 'Não autorizado' }, { status: 401 });
+  }
 
-    if (!session || session.user?.role !== 'ADMIN') {
-        return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+  try {
+    const json = await request.json();
+    const data = createPerguntaSchema.parse(json);
+
+    // Lógica para definir a ordem (ex: colocar como última)
+    const ultimaPergunta = await prisma.pergunta.findFirst({
+      where: { formularioId: data.formularioId },
+      orderBy: { ordem: 'desc' }
+    });
+    const novaOrdem = (ultimaPergunta?.ordem ?? 0) + 1;
+
+    const novaPergunta = await prisma.pergunta.create({
+      data: { ...data, ordem: novaOrdem },
+    });
+    return NextResponse.json(novaPergunta, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ message: 'Dados inválidos', issues: error.issues }, { status: 400 });
     }
-    
-    try {
-        const json = await request.json();
-        const data = createPerguntaSchema.parse(json);
-
-        //Verificar se o formularioId existe
-        const formularioExists = await prisma.formulario.findUnique({ where: { id: data.formularioId } });
-        if (!formularioExists) {
-            return NextResponse.json({ message: 'Formulário com o ID fornecido não encontrado.' }, { status: 404 });
-        }
-
-        const novaPergunta = await prisma.pergunta.create({
-            data: {
-                formularioId: data.formularioId,
-                texto: data.texto,
-                tipoResposta: data.tipoResposta,
-                opcoesJson: data.opcoesJson as any,
-                obrigatoria: data.obrigatoria,
-                ordem: data.ordem,
-            },
-        });
-
-        return NextResponse.json(novaPergunta, { status: 201 });
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            console.error('Erro de validação Zod ao criar Pergunta:', error.errors);
-            return NextResponse.json({ errors: error.errors, message: 'Dados de entrada inválidos.' }, { status: 400 });
-        }
-        console.error('Erro ao criar Pergunta:', error);
-        return NextResponse.json({ message: 'Erro interno do servidor ao criar Pergunta.' }, { status: 500 });
-    }
+    return NextResponse.json({ message: 'Erro interno do servidor.' }, { status: 500 });
+  }
 }
 
-// Handler para listar Perguntas
 export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
-
     if (!session || session.user?.role !== 'ADMIN') {
-        return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+        return NextResponse.json({ message: 'Não autorizado' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
     const formularioId = searchParams.get('formularioId');
 
-    try {
-        const perguntas = await prisma.pergunta.findMany({
-            where: formularioId ? { formularioId: parseInt(formularioId) } : {},
-            orderBy: { ordem: 'asc' }, // Ordenar pela ordem definida
-            select: {
-                id: true,
-                texto: true,
-                tipoResposta: true,
-                opcoesJson: true,
-                obrigatoria: true,
-                ordem: true,
-                formularioId: true,
-            }
-        });
-        return NextResponse.json(perguntas);
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            return NextResponse.json({ errors: error.errors, message: 'Dados de entrada inválidos.' }, { status: 400 });
-        }
-        console.error('Erro ao buscar Perguntas:', error);
-        return NextResponse.json({ message: 'Erro ao buscar Perguntas.' }, { status: 500 });
+    if (!formularioId) {
+        return NextResponse.json({ message: "O 'formularioId' é obrigatório." }, { status: 400 });
     }
+
+    const perguntas = await prisma.pergunta.findMany({
+        where: { formularioId: parseInt(formularioId) },
+        orderBy: { ordem: 'asc' },
+    });
+
+    return NextResponse.json(perguntas);
 }
