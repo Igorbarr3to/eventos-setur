@@ -2,8 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/navigation/admin-sidebar";
+import { Navbar } from "@/components/navigation/admin-navbar";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -13,14 +12,11 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   }
 
   return (
-    <div className="flex min-h-screen">
-      <SidebarProvider>
-        <AppSidebar />
-        <main className="flex-1 p-8">
-          <SidebarTrigger />
+    <div className="flex min-h-screen flex-col">
+        <Navbar />     
+        <main className="flex-1"> 
             {children}
         </main>
-      </SidebarProvider>
     </div>
   );
 }

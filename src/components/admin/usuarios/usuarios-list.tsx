@@ -39,8 +39,8 @@ export default function UsuariosList({ usuariosIniciais }: UsuariosListProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Gerenciamento de Usuários</h1>
+      <div className="flex flex-col justify-between items-center sm:flex-row">
+        <h1 className="text-lg font-bold">Gerenciamento de Usuários</h1>
         <CriarUsuariosModal onUserCreated={refetchUsers} />
       </div>
 

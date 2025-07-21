@@ -75,7 +75,7 @@ export default function CriarUsuariosModal({ onUserCreated }: CriarUsuariosModal
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <DialogTrigger className="text-sm bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                 Cadastrar Novo Usuário
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] bg-white">

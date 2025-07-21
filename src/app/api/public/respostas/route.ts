@@ -2,7 +2,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { TipoResposta } from '../../../../types/types'; 
+import { TipoResposta } from '../../../../../types/types'; 
 
 // Zod Schema para validar os detalhes de uma resposta individual
 const respostaDetalheSchema = z.object({
