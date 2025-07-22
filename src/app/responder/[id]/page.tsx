@@ -10,58 +10,90 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { useParams } from "next/navigation";
 
 type FormularioComPerguntas = Formulario & { perguntas: Pergunta[] };
 
 function RenderizarPergunta({ pergunta, control }: { pergunta: Pergunta; control: any }) {
-    const opcoes = pergunta.opcoesJson as { opcoes?: string[] };
-    return (
-        <FormField
-            control={control}
-            name={`respostas.${pergunta.id}`}
-            render={({ field }) => (
-                <FormItem className="bg-white p-6 rounded-lg border">
-                    <FormLabel className="text-base font-semibold">{pergunta.texto}</FormLabel>
-                    {pergunta.obrigatoria && <span className="text-red-500 ml-1">*</span>}
-                    <FormControl className="mt-4">
-                        <>
-                            {pergunta.tipoResposta === TipoResposta.TEXTO && <Textarea {...field} />}
-                            {pergunta.tipoResposta === TipoResposta.NUMERO && <Input type="number" {...field} onChange={e => field.onChange(e.target.value === '' ? null : parseInt(e.target.value))} />}
-                            {pergunta.tipoResposta === TipoResposta.DATA && <Input type="date" {...field} />}
-                            {pergunta.tipoResposta === TipoResposta.OPCAO && opcoes?.opcoes && (
-                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                                    {opcoes.opcoes.map(opcao => (
-                                        <FormItem key={opcao} className="flex items-center space-x-3"><FormControl><RadioGroupItem value={opcao} /></FormControl><FormLabel className="font-normal">{opcao}</FormLabel></FormItem>
-                                    ))}
-                                </RadioGroup>
-                            )}
-                            {pergunta.tipoResposta === TipoResposta.MULTIPLA && opcoes?.opcoes && (
-                                <div className="space-y-2">
-                                    {opcoes.opcoes.map(opcao => (
-                                        <FormField key={opcao} control={control} name={`respostas.${pergunta.id}`}
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                                    <FormControl><Checkbox checked={field.value?.includes(opcao)} onCheckedChange={(checked) => { return checked ? field.onChange([...(field.value || []), opcao]) : field.onChange(field.value?.filter((value: string) => value !== opcao)) }} /></FormControl>
-                                                    <FormLabel className="font-normal">{opcao}</FormLabel>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </>
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            )}
-        />
-    );
+  const opcoes = pergunta.opcoesJson as { opcoes?: string[] };
+
+  return (
+    <FormField
+      control={control}
+      name={`respostas.${pergunta.id}`}
+      render={({ field }) => (
+        <FormItem className="bg-white p-6 rounded-lg border">
+          <FormLabel className="text-base font-semibold">{pergunta.texto}</FormLabel>
+          {pergunta.obrigatoria && <span className="text-red-500 ml-1">*</span>}
+          <FormControl className="mt-4">
+            {(() => {
+              switch (pergunta.tipoResposta) {
+                case TipoResposta.TEXTO:
+                  return <Textarea {...field} />;
+                case TipoResposta.NUMERO:
+                  return <Input type="number" {...field} onChange={e => field.onChange(e.target.value === '' ? null : parseInt(e.target.value))} />;
+                case TipoResposta.DATA:
+                  return <Input type="date" {...field} />;
+                case TipoResposta.OPCAO:
+                  if (!opcoes?.opcoes) return null;
+                  return (
+                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
+                      {opcoes.opcoes.map(opcao => (
+                        <FormItem key={opcao} className="flex items-center space-x-3">
+                          <FormControl><RadioGroupItem value={opcao} /></FormControl>
+                          <FormLabel className="font-normal">{opcao}</FormLabel>
+                        </FormItem>
+                      ))}
+                    </RadioGroup>
+                  );
+                case TipoResposta.MULTIPLA:
+                  if (!opcoes?.opcoes) return null;
+                  return (
+                    <div className="space-y-2">
+                      {opcoes.opcoes.map(opcao => (
+                        <FormField
+                          key={opcao}
+                          control={control}
+                          name={`respostas.${pergunta.id}`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(opcao)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([...(field.value || []), opcao])
+                                      : field.onChange(field.value?.filter((value: string) => value !== opcao))
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal">{opcao}</FormLabel>
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                    </div>
+                  );
+
+                default:
+                  return <Input {...field} />; // fallback seguro
+              }
+            })()}
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
 }
 
-export default function PaginaDeResposta({ params }: { params: { id: string } }) {
+
+export default function PaginaDeResposta() {
     const [formulario, setFormulario] = useState<FormularioComPerguntas | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [success, setSuccess] = useState(false);
+    const params = useParams();
+    const formId = Array.isArray(params.id) ? params.id[0] : params.id;
 
     const form = useForm();
 
@@ -82,7 +114,6 @@ export default function PaginaDeResposta({ params }: { params: { id: string } })
         fetchFormulario();
     }, [params.id]);
 
-    // 👇 A LÓGICA DE SUBMISSÃO FOI TOTALMENTE ADAPTADA 👇
     const onSubmit = async (data: any) => {
         if (!formulario) return;
 

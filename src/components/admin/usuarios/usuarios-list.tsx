@@ -5,7 +5,6 @@ import { User } from "@prisma/client";
 import CriarUsuariosModal from "./criar-usuarios-modal";
 import { TabelaUsuarios } from "./tabela-usuarios";
 
-
 type SafeUser = Omit<User, 'password' | 'emailVerified'>;
 
 interface UsuariosListProps {

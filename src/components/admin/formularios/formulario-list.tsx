@@ -4,11 +4,12 @@ import { Formulario } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { FileText, ChevronDown, ChevronUp, Share2 } from "lucide-react";
 import { CriarFormularioModal } from "./criar-formulario-modal";
 import { DeletarFormularioBotao } from "./deletar-formulario-modal";
 import { EditarFormularioModal } from "./editar-formulario-modal";
 import { PerguntasList } from "../perguntas/perguntas-list";
+import { toast } from "sonner";
 
 interface FormulariosListProps {
     pesquisaId: number;
@@ -76,6 +77,18 @@ export function FormulariosList({ pesquisaId }: FormulariosListProps) {
                                 <CardContent className="flex  justify-between">
                                     <p className="text-sm text-muted-foreground">Tipo: {form.tipo}</p>
                                     <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                const url = `${window.location.origin}/responder/${form.id}`;
+                                                navigator.clipboard.writeText(url);
+                                                toast.success("Link público copiado para a área de transferência!");
+                                            }}
+                                        >
+                                            <Share2 className="mr-2 h-4 w-4" />
+                                            Compartilhar
+                                        </Button>
                                         <EditarFormularioModal formulario={form} onFormularioEditado={refetchFormularios} />
                                         <DeletarFormularioBotao formularioId={form.id} onFormularioDeleted={refetchFormularios} />
                                     </div>

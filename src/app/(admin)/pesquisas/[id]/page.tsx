@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { FormulariosList } from "@/components/admin/formularios/formulario-list";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeftFromLine, Backpack } from "lucide-react";
+import { ArrowLeftFromLine,  } from "lucide-react";
 
 async function getPesquisaById(id: string): Promise<Pesquisa | null> {
     try {
@@ -43,9 +43,9 @@ export default async function PaginaDetalhePesquisa({ params }: { params: { id: 
     return (
         <div className="p-4 sm:p-6 md:p-8 space-y-8">
             {/* Cabeçalho da Página */}
-            <Button variant='outline' className="transition transform hover:scale-105">
+            <Button variant='outline' className=" transition transform hover:scale-105">
+                <Link href={'/pesquisas'} className="flex justify-center items-center gap-2">
                 <ArrowLeftFromLine />
-                <Link href={'/pesquisas'}>
                     Voltar
                 </Link>
             </Button>
@@ -73,7 +73,7 @@ export default async function PaginaDetalhePesquisa({ params }: { params: { id: 
                 </div>
             )}
 
-            {/* --- Seção de Gerenciamento de Formulários (Próximo Passo) --- */}
+            {/* --- Seção de Gerenciamento de Formulários --- */}
             <div className="space-y-4 pt-8 border-t">
                 <div className="flex justify-between items-center">
                     <FormulariosList pesquisaId={pesquisa.id} />
