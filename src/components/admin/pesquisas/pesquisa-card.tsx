@@ -48,7 +48,7 @@ export function PesquisaCard({ pesquisa, onListChange }: PesquisaCardProps) {
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between gap-2 p-4 mt-4">
+      <CardFooter className="flex justify-between gap-2">
         <Link href={`/pesquisas/${pesquisa.id}`}>
           <Button className="bg-gray-400 border ">
             Gerenciar

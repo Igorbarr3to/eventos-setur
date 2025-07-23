@@ -30,7 +30,7 @@ export function Navbar() {
   const userInitials = session?.user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
 
   return (
-    <header className="sticky px-2 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky px-2 top-0 z-50 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         
         <Link href="/dashboard" className="text-xl font-bold">
@@ -41,7 +41,7 @@ export function Navbar() {
         <nav className="hidden md:flex items-center gap-4">
           {navItems.map((item) => (
             <Link key={item.title} href={item.href} passHref>
-              <Button className='hover:border-b border-b-blue-700'>{item.title}</Button>
+              <Button className='bg-white hover:border-b border-b-blue-700'>{item.title}</Button>
             </Link>
           ))}
         </nav>
@@ -51,7 +51,7 @@ export function Navbar() {
           <div className="hidden md:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <Button className="bg-white relative h-10 w-10 rounded-full">
                   <Avatar>
                     <AvatarImage src={session?.user?.image ?? ''} alt={session?.user?.name ?? ''} />
                     <AvatarFallback>{userInitials}</AvatarFallback>
@@ -76,7 +76,6 @@ export function Navbar() {
           {/* Botão Sanduíche e Menu Mobile (só aparece em telas pequenas) */}
           <div className="md:hidden">
             <Button
-              variant="ghost"
               size="icon"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >

@@ -32,9 +32,9 @@ export default function PesquisasList({ pesquisasIniciais }: PesquisasListProps)
   }, [pesquisasIniciais]);
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Gerenciamento de Pesquisas</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col justify-between items-center sm:flex-row">
+        <h1 className="text-lg font-bold">Gerenciamento de Pesquisas</h1>
         <CriarPesquisaModal onPesquisaCriada={refetchPesquisas} />
       </div>
 
