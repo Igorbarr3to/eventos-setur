@@ -67,7 +67,7 @@ export function CriarFormularioModal({ pesquisaId, onFormularioCriado }: CriarFo
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Criar Novo Formulário</Button>
+        <Button variant='createModal'>Criar Novo Formulário</Button>
       </DialogTrigger>
       <DialogContent className="bg-white">
         <DialogHeader>
@@ -121,7 +121,7 @@ export function CriarFormularioModal({ pesquisaId, onFormularioCriado }: CriarFo
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
+            <Button type="submit" variant='create' disabled={form.formState.isSubmitting} className="w-full">
               {form.formState.isSubmitting ? "Criando..." : "Criar Formulário"}
             </Button>
           </form>

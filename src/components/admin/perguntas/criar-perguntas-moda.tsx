@@ -125,7 +125,7 @@ export function CriarPerguntaModal({ formularioId, onPerguntaCriada }: CriarPerg
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="createModal" size="sm">
                     <PlusCircle className="h-4 w-4" /> 
                     Adicionar Pergunta
                 </Button>
@@ -294,7 +294,7 @@ export function CriarPerguntaModal({ formularioId, onPerguntaCriada }: CriarPerg
                             )}
                         />
 
-                        <Button type="submit" disabled={form.formState.isSubmitting} className="w-full border">
+                        <Button type="submit" variant='create' disabled={form.formState.isSubmitting} className="w-full border">
                             {form.formState.isSubmitting ? "Criando..." : "Criar Pergunta"}
                         </Button>
                     </form>

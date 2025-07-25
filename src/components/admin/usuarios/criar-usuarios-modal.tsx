@@ -97,8 +97,10 @@ export default function CriarUsuariosModal({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <Button variant="createModal">Cadastrar Novo Usuário</Button>
+      <DialogTrigger asChild>
+        <Button variant="createModal">
+          Cadastrar Novo Usuário
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-white">
         <DialogHeader>
