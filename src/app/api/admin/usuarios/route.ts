@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Criptografar a senha (passo de segurança crucial)
+    // Criptografar a senha 
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     // Criar o usuário no banco de dados

@@ -30,7 +30,7 @@ export function Navbar() {
   const userInitials = session?.user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
 
   return (
-    <header className="sticky px-2 top-0 z-50 w-full border-b backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky px-2 top-0 z-50 w-full bg-green-700/80 border-b backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         
         <Link href="/dashboard" className="text-xl font-bold">
