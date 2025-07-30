@@ -21,6 +21,7 @@ const navItems = [
   { title: "Home", href: "/dashboard",},
   { title: "Usuários", href: "/usuarios",},
   { title: "Pesquisas", href: "/pesquisas",},
+  { title: "Modelos", href: "/templates",},
 ];
 
 export function Navbar() {

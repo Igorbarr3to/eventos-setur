@@ -161,3 +161,34 @@ model RespostaDetalhe {
 
   @@map("respostas_detalhes")
 }
+
+model FormularioTemplate {
+  id        Int      @id @default(autoincrement())
+  nome      String   @db.VarChar(255)
+  descricao String?  @db.Text
+  tipo      FormularioTipo @default(PARTICIPANTE)
+  
+  perguntas PerguntaTemplate[] // Um template de formulário tem várias perguntas modelo
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("formularios_templates")
+}
+
+model PerguntaTemplate {
+  id             Int      @id @default(autoincrement())
+  templateId     Int      @map("template_id")
+  template       FormularioTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  texto          String   @db.Text
+  tipoResposta   TipoResposta @map("tipo_resposta")
+  opcoesJson     Json?    @map("opcoes_json")
+  obrigatoria    Boolean  @default(false)
+  ordem          Int?
+
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("perguntas_templates")
+}
