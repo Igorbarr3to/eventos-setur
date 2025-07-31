@@ -1,11 +1,15 @@
-// app/admin/pesquisas/[id]/resultados/page.tsx
-
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import VisualizacaoDeRespostas from "@/components/admin/respostas/visualizacao-respostas";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Pesquisa } from "@prisma/client";
-
 
 interface PerguntaInfo {
   texto: string;
@@ -28,7 +32,7 @@ interface RespostaCompleta {
 // Função para buscar os dados no servidor
 async function getRespostas(pesquisaId: string): Promise<RespostaCompleta[]> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/respostas?pesquisaId=${pesquisaId}`,
       {
@@ -41,6 +45,7 @@ async function getRespostas(pesquisaId: string): Promise<RespostaCompleta[]> {
       console.error("Falha ao buscar respostas:", response.status);
       return [];
     }
+
     return response.json();
   } catch (error) {
     console.error("Erro crítico ao buscar respostas:", error);
@@ -50,11 +55,14 @@ async function getRespostas(pesquisaId: string): Promise<RespostaCompleta[]> {
 
 async function getPesquisa(pesquisaId: string): Promise<Pesquisa | null> {
   try {
-    const cookieStore = cookies();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/pesquisas/${pesquisaId}`, {
-      headers: { Cookie: cookieStore.toString() },
-      cache: 'no-store',
-    });
+    const cookieStore = await cookies();
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/pesquisas/${pesquisaId}`,
+      {
+        headers: { Cookie: cookieStore.toString() },
+        cache: "no-store",
+      }
+    );
     if (!response.ok) return null;
     return response.json();
   } catch (error) {
@@ -63,21 +71,25 @@ async function getPesquisa(pesquisaId: string): Promise<Pesquisa | null> {
   }
 }
 
+export default async function PaginaResultados({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { id } = await params;
 
-// A página em si
-export default async function PaginaResultados({params }: {params: { id: string } }) {
-   const [pesquisa, respostas] = await Promise.all([
-    getPesquisa(params.id),
-    getRespostas(params.id)
+  const [pesquisa, respostas] = await Promise.all([
+    await getPesquisa(id),
+    await getRespostas(id),
   ]);
 
-  if (!params.id) {
+  if (!id) {
     notFound();
   }
 
   return (
     <div className="p-4 sm:p-6 md:p-8">
-     <Breadcrumb>
+      <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/pesquisas">Pesquisas</BreadcrumbLink>
@@ -95,7 +107,7 @@ export default async function PaginaResultados({params }: {params: { id: string 
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-  
+
       <VisualizacaoDeRespostas respostasIniciais={respostas} />
     </div>
   );

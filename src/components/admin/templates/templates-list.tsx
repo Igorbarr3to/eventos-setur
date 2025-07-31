@@ -52,7 +52,7 @@ export default function TemplatesList({
             </CardHeader>
             <CardFooter className="flex justify-between gap-2">
               <Link href={`/templates/${template.id}`}>
-                <Button className="bg-zinc-400/60 border border-zinc-500 transition transform hover:cursor-pointer hover:scale-110 ">
+                <Button className="bg-zinc-400/60 border border-zinc-500 transition transform hover:cursor-pointer hover:scale-110">
                   Gerenciar
                 </Button>
               </Link>

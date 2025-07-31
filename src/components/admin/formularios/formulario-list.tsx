@@ -11,13 +11,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileText, ChevronDown, ChevronUp, Share2 } from "lucide-react";
+import { FileText, Share2 } from "lucide-react";
 import { CriarFormularioModal } from "./criar-formulario-modal";
 import { DeletarFormularioBotao } from "./deletar-formulario-modal";
 import { EditarFormularioModal } from "./editar-formulario-modal";
-import { PerguntasList } from "../perguntas/perguntas-list";
 import { toast } from "sonner";
 import { AplicarTemplateModal } from "./aplicar-template-modal";
+import Link from "next/link";
 
 interface FormulariosListProps {
   pesquisaId: number;
@@ -26,8 +26,6 @@ interface FormulariosListProps {
 export function FormulariosList({ pesquisaId }: FormulariosListProps) {
   const [formularios, setFormularios] = useState<Formulario[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  // 2. Estado para controlar qual card está expandido
-  const [expandedFormId, setExpandedFormId] = useState<number | null>(null);
 
   const refetchFormularios = async () => {
     setIsLoading(true);
@@ -39,7 +37,7 @@ export function FormulariosList({ pesquisaId }: FormulariosListProps) {
       const data = await response.json();
       setFormularios(data);
     } catch (error) {
-      console.error(error);
+      toast.error("erro ao carregar formulários: " + (error as Error).message);
       setFormularios([]);
     } finally {
       setIsLoading(false);
@@ -50,23 +48,20 @@ export function FormulariosList({ pesquisaId }: FormulariosListProps) {
     refetchFormularios();
   }, [pesquisaId]);
 
-  // Função para alternar a exibição da seção de perguntas
-  const toggleExpand = (formId: number) => {
-    setExpandedFormId((prevId) => (prevId === formId ? null : formId));
-  };
-
   return (
     <div className="space-y-4 w-full">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-center">
         <h2 className="text-2xl font-semibold">Formulários da Pesquisa</h2>
-        <CriarFormularioModal
-          pesquisaId={pesquisaId}
-          onFormularioCriado={refetchFormularios}
-        />
-        <AplicarTemplateModal
-          pesquisaId={pesquisaId}
-          onFormularioCriado={refetchFormularios}
-        />
+        <div className="space-y-2 sm:space-x-4">
+          <AplicarTemplateModal
+            pesquisaId={pesquisaId}
+            onFormularioCriado={refetchFormularios}
+          />
+          <CriarFormularioModal
+            pesquisaId={pesquisaId}
+            onFormularioCriado={refetchFormularios}
+          />
+        </div>
       </div>
 
       {isLoading && <p>Carregando formulários...</p>}
@@ -84,27 +79,35 @@ export function FormulariosList({ pesquisaId }: FormulariosListProps) {
       )}
 
       {!isLoading && formularios.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-14">
           {formularios.map((form) => (
             <div key={form.id}>
-              <Card
-                className={`w-[400px] bg-white transition-all ${
-                  expandedFormId === form.id ? "rounded-b-lg" : ""
-                }`}
-              >
+              <Card className="bg-gray-100 flex flex-col justify-between border-none shadow-xl-t shadow-black">
                 <CardHeader>
-                  <CardTitle>{form.nome}</CardTitle>
+                  <CardTitle className="flex  justify-between">
+                    {form.nome}
+                    <p className="text-sm text-muted-foreground">
+                      Tipo: {form.tipo}
+                    </p>
+                  </CardTitle>
                   <CardDescription>
                     {form.descricao || "Sem descrição"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex  justify-between">
-                  <p className="text-sm text-muted-foreground">
-                    Tipo: {form.tipo}
-                  </p>
-                  <div className="flex gap-2">
+                <CardContent className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+                  <Button
+                    asChild
+                    className="bg-zinc-400/60 border border-zinc-500 transition transform hover:cursor-pointer hover:scale-110 "
+                  >
+                    <Link href={`/formularios/${form.id}`}>
+                      Gerenciar Perguntas
+                    </Link>
+                  </Button>
+
+                  <div className="flex justify-between items-center w-full">
                     <Button
-                      variant="outline"
+                      variant={"outline"}
+                      className="transition transform hover:cursor-pointer hover:scale-110"
                       size="sm"
                       onClick={() => {
                         const url = `${window.location.origin}/responder/${form.id}`;
@@ -114,36 +117,21 @@ export function FormulariosList({ pesquisaId }: FormulariosListProps) {
                         );
                       }}
                     >
-                      <Share2 className="mr-2 h-4 w-4" />
+                      <Share2 />
                       Compartilhar
                     </Button>
-                    <EditarFormularioModal
-                      formulario={form}
-                      onFormularioEditado={refetchFormularios}
-                    />
-                    <DeletarFormularioBotao
-                      formularioId={form.id}
-                      onFormularioDeleted={refetchFormularios}
-                    />
+                    <div className="flex gap-2">
+                      <EditarFormularioModal
+                        formulario={form}
+                        onFormularioEditado={refetchFormularios}
+                      />
+                      <DeletarFormularioBotao
+                        formularioId={form.id}
+                        onFormularioDeleted={refetchFormularios}
+                      />
+                    </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex flex-col justify-between items-center border-t pt-4">
-                  {/* 3. Botão para expandir/recolher */}
-                  <Button variant="ghost" onClick={() => toggleExpand(form.id)}>
-                    {expandedFormId === form.id ? (
-                      <ChevronUp className="mr-2 h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="mr-2 h-4 w-4" />
-                    )}
-                    Perguntas
-                  </Button>
-
-                  {expandedFormId === form.id && (
-                    <div className="">
-                      <PerguntasList formularioId={form.id} />
-                    </div>
-                  )}
-                </CardFooter>
               </Card>
             </div>
           ))}

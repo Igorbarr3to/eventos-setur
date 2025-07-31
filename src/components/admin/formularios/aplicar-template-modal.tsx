@@ -59,14 +59,14 @@ export function AplicarTemplateModal({ pesquisaId, onFormularioCriado }: Aplicar
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Usar Template</Button>
+        <Button variant="outline">Usar modelo</Button>
       </DialogTrigger>
       <DialogContent className="bg-white">
         <DialogHeader>
-          <DialogTitle>Aplicar um Template de Formulário</DialogTitle>
+          <DialogTitle>Aplicar um modelo de Formulário</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
-          <Label htmlFor="template-select">Selecione um template</Label>
+          <Label htmlFor="template-select">Selecione um modelo</Label>
           <Select onValueChange={setSelectedTemplateId}>
             <SelectTrigger id="template-select">
               <SelectValue placeholder="Escolha um modelo..." />

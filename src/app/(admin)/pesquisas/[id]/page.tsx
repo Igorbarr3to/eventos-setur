@@ -5,7 +5,21 @@ import { Badge } from "@/components/ui/badge";
 import { FormulariosList } from "@/components/admin/formularios/formulario-list";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 async function getPesquisaById(id: string): Promise<Pesquisa | null> {
   try {
@@ -47,7 +61,7 @@ export default async function PaginaDetalhePesquisa({
   }
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 space-y-8">
+    <div className="p-4 space-y-2 sm:p-6 md:p-8 ">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -55,56 +69,80 @@ export default async function PaginaDetalhePesquisa({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{pesquisa.titulo}</BreadcrumbPage>
+            <BreadcrumbPage className="text-lg font-semibold">{pesquisa.titulo}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold">{pesquisa.titulo}</h1>
-          <p className="text-muted-foreground mt-2">{pesquisa.descricao}</p>
-          <Link href={`/pesquisas/${pesquisa.id}/resultados`}>
-            <Button>Ver Resultados</Button>
-          </Link>
-        </div>
-        <Badge variant="secondary" className="text-sm">
-          {pesquisa.status}
-        </Badge>
+
+      {pesquisa.status === "PLANEJADO" ? (
+        <Badge className="bg-amber-400">Planejado</Badge>
+      ) : pesquisa.status === "CANCELADO" ? (
+        <Badge className="bg-red-400">Cancelado</Badge>
+      ) : pesquisa.status === "CONCLUIDO" ? (
+        <Badge className="bg-green-400">Concluído</Badge>
+      ) : (
+        <Badge className="bg-blue-400">Em andamento</Badge>
+      )}
+
+      <div className="flex flex-col justify-between items-start gap-2 md:flex-row">
+        <p className="text-muted-foreground mt-2 text-justify">{pesquisa.descricao}</p>
+
+        <Link href={`/pesquisas/${pesquisa.id}/resultados`}>
+          <Button className="bg-emerald-400 shadow-2xl shadow-black font-semibold transition transform hover:scale-105">
+            Resultados da Pesquisa
+          </Button>
+        </Link>
       </div>
 
       {/* Seção de Detalhes do Projeto */}
       {pesquisa.tipo === "EVENTO" && (
-        <div className="space-y-4 p-6 border rounded-lg bg-slate-50">
-          <h2 className="text-xl font-semibold border-b pb-2">
-            Detalhes do Projeto
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-            <div>
-              <strong>Título do Projeto:</strong>{" "}
-              {pesquisa.tituloProjeto || "N/A"}
+        <Card className="bg-gray-100 flex flex-col justify-between border-none shadow-xl-t shadow-black">
+          <CardHeader>
+            <CardTitle>Detalhes do Projeto</CardTitle>
+            <CardDescription>
+              Informações detalhadas sobre o projeto ou evento associado a esta
+              pesquisa.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+              <div>
+                <strong className="text-muted-foreground">
+                  Título do Projeto:
+                </strong>
+                <p>{pesquisa.tituloProjeto || "N/A"}</p>
+              </div>
+              <div>
+                <strong className="text-muted-foreground">Proponente:</strong>
+                <p>{pesquisa.proponente || "N/A"}</p>
+              </div>
+              <div>
+                <strong className="text-muted-foreground">Município:</strong>
+                <p>{pesquisa.municipio || "N/A"}</p>
+              </div>
+              <div>
+                <strong className="text-muted-foreground">Local:</strong>
+                <p>{pesquisa.localAplicacao || "N/A"}</p>
+              </div>
+              <div>
+                <strong className="text-muted-foreground">Início:</strong>
+                <p>
+                  {new Date(pesquisa.dataInicio!).toLocaleDateString("pt-BR")}
+                </p>
+              </div>
+              <div>
+                <strong className="text-muted-foreground">Fim:</strong>
+                <p>{new Date(pesquisa.dataFim!).toLocaleDateString("pt-BR")}</p>
+              </div>
+              <div className="col-span-2">
+                <strong className="text-muted-foreground">
+                  Objetivo Geral:
+                </strong>
+                <p>{pesquisa.objetivoGeral || "N/A"}</p>
+              </div>
             </div>
-            <div>
-              <strong>Proponente:</strong> {pesquisa.proponente || "N/A"}
-            </div>
-            <div>
-              <strong>Município:</strong> {pesquisa.municipio || "N/A"}
-            </div>
-            <div>
-              <strong>Local:</strong> {pesquisa.localAplicacao || "N/A"}
-            </div>
-            <div>
-              <strong>Início:</strong>{" "}
-              {new Date(pesquisa.dataInicio!).toLocaleDateString("pt-BR")}
-            </div>
-            <div>
-              <strong>Fim:</strong>{" "}
-              {new Date(pesquisa.dataFim!).toLocaleDateString("pt-BR")}
-            </div>
-            <div className="col-span-2">
-              <strong>Objetivo Geral:</strong> {pesquisa.objetivoGeral || "N/A"}
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* --- Seção de Gerenciamento de Formulários --- */}

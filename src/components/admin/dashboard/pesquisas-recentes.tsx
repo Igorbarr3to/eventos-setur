@@ -25,9 +25,9 @@ export function PesquisasRecentes({ pesquisas }: PesquisasRecentesProps) {
       </CardHeader>
       <CardContent>
         {pesquisas.length > 0 ? (
-          <div className="space-y-4 bg-zinc-300 p-2 rounded-md">
+          <div className="space-y-4 ">
             {pesquisas.map((pesquisa) => (
-              <div key={pesquisa.id} className="flex items-center">
+              <div key={pesquisa.id} className="flex items-center bg-zinc-300 p-2 rounded-md">
                 <div className="ml-4 space-y-4 ">
                   <p className="text-sm font-medium leading-none">
                     {pesquisa.titulo}
