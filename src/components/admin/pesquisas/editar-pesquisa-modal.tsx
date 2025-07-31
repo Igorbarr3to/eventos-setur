@@ -132,7 +132,7 @@ export function EditarPesquisaModal({ pesquisa, onPesquisaEditada }: EditarPesqu
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
                 {/* --- SEÇÃO 1: INFORMAÇÕES BÁSICAS --- */}
-                <fieldset className="space-y-4 rounded-lg border p-4">
+                <fieldset className="space-y-4">
                   <legend className="-ml-1 px-1 text-lg font-medium">Informações Básicas</legend>
                   <FormField
                     control={form.control}
@@ -206,7 +206,7 @@ export function EditarPesquisaModal({ pesquisa, onPesquisaEditada }: EditarPesqu
 
                 {/* --- SEÇÃO 2: DETALHES DO PROJETO (CONDICIONAL) --- */}
                 {tipoSelecionado === 'EVENTO' && (
-                  <fieldset className="space-y-4 rounded-lg border p-4">
+                  <fieldset className="space-y-4">
                     <legend className="-ml-1 px-1 text-lg font-medium">Detalhes do Projeto/Evento</legend>
                     <FormField control={form.control} name="tituloProjeto" render={({ field }) => (<FormItem><FormLabel>Título do Projeto</FormLabel><FormControl><Input placeholder="Título completo do projeto vinculado" {...field} value={field.value ?? ""} /></FormControl><FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="objetivoGeral" render={({ field }) => (<FormItem><FormLabel>Objetivo Geral</FormLabel><FormControl><Textarea placeholder="Descreva o objetivo principal..." {...field} value={field.value ?? ""} /></FormControl><FormMessage /></FormItem>)} />
@@ -223,7 +223,7 @@ export function EditarPesquisaModal({ pesquisa, onPesquisaEditada }: EditarPesqu
                 )}
 
                 {/* --- SEÇÃO 3: ADMINISTRAÇÃO E LOCALIZAÇÃO --- */}
-                <fieldset className="space-y-4 rounded-lg border p-4">
+                <fieldset className="space-y-4">
                   <legend className="-ml-1 px-1 text-lg font-medium">Administração e Localização</legend>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="proponente" render={({ field }) => (<FormItem><FormLabel>Proponente</FormLabel><FormControl><Input {...field} value={field.value ?? ""} /></FormControl><FormMessage /></FormItem>)} />
@@ -236,7 +236,7 @@ export function EditarPesquisaModal({ pesquisa, onPesquisaEditada }: EditarPesqu
                 </fieldset>
 
                 {/* --- SEÇÃO 4: INFORMAÇÕES FINANCEIRAS --- */}
-                <fieldset className="space-y-4 rounded-lg border p-4">
+                <fieldset className="space-y-4">
                   <legend className="-ml-1 px-1 text-lg font-medium">Informações Financeiras</legend>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField control={form.control} name="valorTotal" render={({ field }) => (<FormItem><FormLabel>Valor Total (R$)</FormLabel><FormControl><Input type="number" step="0.01" placeholder="1500.50" {...field} value={Number(field.value ?? 0)} /></FormControl><FormMessage /></FormItem>)} />
@@ -245,7 +245,7 @@ export function EditarPesquisaModal({ pesquisa, onPesquisaEditada }: EditarPesqu
                   </div>
                 </fieldset>
 
-                <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
+                <Button type="submit" variant={'create'} disabled={form.formState.isSubmitting} className="w-full">
                   {form.formState.isSubmitting ? "Salvando..." : "Salvar Alterações"}
                 </Button>
               </form>

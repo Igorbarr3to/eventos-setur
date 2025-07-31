@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useSession } from 'next-auth/react';
-import {Menu, X } from 'lucide-react';
+import { useState } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { Menu, X } from "lucide-react";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,34 +15,45 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import SingOutButton from './signOut-button';
+import SingOutButton from "./signOut-button";
+import Image from "next/image";
 
 const navItems = [
-  { title: "Home", href: "/dashboard",},
-  { title: "Usuários", href: "/usuarios",},
-  { title: "Pesquisas", href: "/pesquisas",},
-  { title: "Modelos", href: "/templates",},
+  { title: "Home", href: "/dashboard" },
+  { title: "Usuários", href: "/usuarios" },
+  { title: "Pesquisas", href: "/pesquisas" },
+  { title: "Modelos", href: "/templates" },
 ];
 
 export function Navbar() {
   const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  const userInitials = session?.user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
+
+  const userInitials =
+    session?.user?.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase() || "U";
 
   return (
-    <header className="sticky px-2 top-0 z-50 w-full bg-green-700/80 border-b backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        
-        <Link href="/dashboard" className="text-xl font-bold">
+    <header className="sticky p-2 top-0 z-50 w-full bg-blue-500/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex items-center justify-between h-full">
+        <Link href="/dashboard" className="flex text-xl gap-2 items-center font-semibold text-white">
+        <Image 
+          src={'/governo-do-estado-ro.svg'}
+          alt="Governo do Estado de Rondônia"
+          width={120}
+          height={80}
+        />
           MoniTUR
         </Link>
 
-        {/* Navegação para Desktop (escondida em telas pequenas) */}
+        {/* Navegação para Desktop */}
         <nav className="hidden md:flex items-center gap-4">
           {navItems.map((item) => (
-            <Link key={item.title} href={item.href} passHref>
-              <Button className='bg-white hover:border-b border-b-blue-700'>{item.title}</Button>
+            <Link key={item.title} href={item.href} className="h-10 rounded-md w-28 flex justify-center items-center text-white font-medium hover:bg-blue-600 transition-colors">
+              {item.title}
             </Link>
           ))}
         </nav>
@@ -54,16 +65,27 @@ export function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button className="bg-white relative h-10 w-10 rounded-full">
                   <Avatar>
-                    <AvatarImage src={session?.user?.image ?? ''} alt={session?.user?.name ?? ''} />
+                    <AvatarImage
+                      src={session?.user?.image ?? ""}
+                      alt={session?.user?.name ?? ""}
+                    />
                     <AvatarFallback>{userInitials}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-zinc-50" align="end" forceMount>
+              <DropdownMenuContent
+                className="w-56 bg-zinc-50"
+                align="end"
+                forceMount
+              >
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{session?.user?.name}</p>
-                    <p className="text-xs leading-none text-muted-foreground">{session?.user?.email}</p>
+                    <p className="text-sm font-medium leading-none">
+                      {session?.user?.name}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {session?.user?.email}
+                    </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -80,31 +102,35 @@ export function Navbar() {
               size="icon"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
               <span className="sr-only">Toggle Menu</span>
             </Button>
           </div>
         </div>
       </div>
-      
+
       {/* Conteúdo do Menu Mobile Dropdown */}
       {isMobileMenuOpen && (
         <div className="md:hidden animate-in fade-in-20 slide-in-from-top-2">
-          <div className="grid gap-2 p-4">
+          <div className="grid grid-cols-2 place-items-center gap-2 p-4">
             {navItems.map((item) => (
               <Link
                 key={item.title}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center rounded-md p-2 text-sm font-medium hover:bg-accent"
+                className="flex items-center text-white rounded-md p-2 text-sm font-medium"
               >
                 {item.title}
               </Link>
             ))}
-            <div className='border-t pt-2'>
-               <SingOutButton />
-            </div>
           </div>
+            <div className="border-t pt-2">
+              <SingOutButton />
+            </div>
         </div>
       )}
     </header>

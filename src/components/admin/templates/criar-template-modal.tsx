@@ -65,7 +65,7 @@ export function CriarTemplateModal({ onTemplateCriado }: CriarTemplateModalProps
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant='createModal'>Criar Novo Template</Button>
+        <Button variant='openModal'>Criar Novo Template</Button>
       </DialogTrigger>
       <DialogContent className="bg-white">
         <DialogHeader>

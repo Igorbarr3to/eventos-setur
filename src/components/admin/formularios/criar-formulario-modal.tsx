@@ -67,7 +67,7 @@ export function CriarFormularioModal({ pesquisaId, onFormularioCriado }: CriarFo
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant='createModal'>Criar Novo Formulário</Button>
+        <Button variant='openModal'>Criar Novo Formulário</Button>
       </DialogTrigger>
       <DialogContent className="bg-white">
         <DialogHeader>

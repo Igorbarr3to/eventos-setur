@@ -63,7 +63,7 @@ export function DeletarPerguntaBotao({ perguntaId, onPerguntaDeleted }: DeletarP
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-red-600 border border-black text-white">
             {isDeleting ? "Excluindo..." : "Sim, excluir"}
           </AlertDialogAction>
         </AlertDialogFooter>

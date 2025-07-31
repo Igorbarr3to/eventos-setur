@@ -67,7 +67,7 @@ export function DeletarPesquisaModal({ pesquisaId, onPesquisaDeleted }: DeletarP
                     </DialogClose>
 
                     <Button
-                        className="bg-red-600 border border-black text-white"
+                        variant={'delete'}
                         onClick={handleDelete}
                         disabled={isDeleting}
                     >

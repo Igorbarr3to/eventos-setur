@@ -297,7 +297,7 @@ export function EditarPerguntaModal({ pergunta, onPerguntaEditada }: EditarPergu
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
+            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full "variant={'create'}>
               {form.formState.isSubmitting ? "Salvando..." : "Salvar Alterações"}
             </Button>
           </form>

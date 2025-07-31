@@ -9,7 +9,7 @@ export default function SingOutButton(){
             signOut();
         }}
         variant="outline"
-        className="hover:bg-red-500 hover:text-white text-red-500 border-red-500"
+        className="bg-red-500 text-white hover:bg-red-600 hover:text-white transition-colors"
         >
             Sair
         </Button>

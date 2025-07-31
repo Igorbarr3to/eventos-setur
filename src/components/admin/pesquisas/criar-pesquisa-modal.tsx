@@ -134,7 +134,7 @@ export default function CriarPesquisaModal({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant='createModal'>
+        <Button variant='openModal'>
           Criar Nova Pesquisa
         </Button>
       </DialogTrigger>

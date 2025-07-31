@@ -125,8 +125,7 @@ export function CriarPerguntaModal({ formularioId, onPerguntaCriada }: CriarPerg
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="createModal" size="sm">
-                    <PlusCircle className="h-4 w-4" /> 
+                <Button variant="openModal" size="sm">
                     Adicionar Pergunta
                 </Button>
             </DialogTrigger>

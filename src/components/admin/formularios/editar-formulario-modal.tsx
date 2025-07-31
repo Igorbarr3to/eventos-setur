@@ -87,7 +87,7 @@ export function EditarFormularioModal({ formulario, onFormularioEditado }: Edita
             <FormField control={form.control} name="nome" render={({ field }) => (<FormItem><FormLabel>Nome do Formulário</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
             <FormField control={form.control} name="tipo" render={({ field }) => (<FormItem><FormLabel>Tipo de Formulário</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent className="bg-white"><SelectItem value={FormularioTipo.PARTICIPANTE}>Participante</SelectItem><SelectItem value={FormularioTipo.EXPOSITOR}>Expositor</SelectItem><SelectItem value={FormularioTipo.ORGANIZADOR}>Organizador</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
             <FormField control={form.control} name="descricao" render={({ field }) => (<FormItem><FormLabel>Descrição</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>)} />
-            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
+            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full" variant={"create"}>
               {form.formState.isSubmitting ? "Salvando..." : "Salvar Alterações"}
             </Button>
           </form>

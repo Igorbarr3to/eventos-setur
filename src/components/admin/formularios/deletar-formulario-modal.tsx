@@ -13,7 +13,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface DeletarFormularioBotaoProps {
@@ -61,7 +60,7 @@ export function DeletarFormularioBotao({ formularioId, onFormularioDeleted }: De
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-red-600 border border-black text-white">
             {isDeleting ? "Excluindo..." : "Sim, excluir"}
           </AlertDialogAction>
         </AlertDialogFooter>
