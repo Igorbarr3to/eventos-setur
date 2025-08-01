@@ -18,7 +18,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user?.role !== 'ADMIN') {
+  if (!session) {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 });
   }
 
@@ -75,7 +75,6 @@ export async function PATCH(
     return NextResponse.json({ message: "Erro interno do servidor." }, { status: 500 });
   }
 }
-
 
 // --- Handler DELETE: Excluir um template ---
 export async function DELETE(

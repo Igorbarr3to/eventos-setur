@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -8,10 +8,29 @@ import { FormularioTipo } from "@prisma/client";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
@@ -26,7 +45,9 @@ interface CriarTemplateModalProps {
   onTemplateCriado: () => void;
 }
 
-export function CriarTemplateModal({ onTemplateCriado }: CriarTemplateModalProps) {
+export function CriarTemplateModal({
+  onTemplateCriado,
+}: CriarTemplateModalProps) {
   const [open, setOpen] = useState(false);
 
   const form = useForm<FormValues>({
@@ -40,9 +61,9 @@ export function CriarTemplateModal({ onTemplateCriado }: CriarTemplateModalProps
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const response = await fetch('/api/admin/templates', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/admin/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
@@ -55,7 +76,6 @@ export function CriarTemplateModal({ onTemplateCriado }: CriarTemplateModalProps
       setOpen(false);
       form.reset();
       onTemplateCriado();
-
     } catch (error: any) {
       toast.error(error.message);
       console.error(error);
@@ -65,11 +85,11 @@ export function CriarTemplateModal({ onTemplateCriado }: CriarTemplateModalProps
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant='openModal'>Criar Novo Template</Button>
+        <Button variant="openModal">Criar Novo Modelo</Button>
       </DialogTrigger>
       <DialogContent className="bg-white">
         <DialogHeader>
-          <DialogTitle>Criar Novo Template de Formulário</DialogTitle>
+          <DialogTitle>Criar Novo Modelo de Formulário</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -78,9 +98,12 @@ export function CriarTemplateModal({ onTemplateCriado }: CriarTemplateModalProps
               name="nome"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome do Template</FormLabel>
+                  <FormLabel>Nome do Modelo</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Avaliação de Evento Padrão" {...field} />
+                    <Input
+                      placeholder="Ex: Avaliação de Evento Padrão"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,14 +115,25 @@ export function CriarTemplateModal({ onTemplateCriado }: CriarTemplateModalProps
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tipo de Formulário</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value={FormularioTipo.PARTICIPANTE}>Participante</SelectItem>
-                      <SelectItem value={FormularioTipo.EXPOSITOR}>Expositor</SelectItem>
-                      <SelectItem value={FormularioTipo.ORGANIZADOR}>Organizador</SelectItem>
+                    <SelectContent className="bg-white">
+                      <SelectItem value={FormularioTipo.PARTICIPANTE}>
+                        Participante
+                      </SelectItem>
+                      <SelectItem value={FormularioTipo.EXPOSITOR}>
+                        Expositor
+                      </SelectItem>
+                      <SelectItem value={FormularioTipo.ORGANIZADOR}>
+                        Organizador
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -113,13 +147,22 @@ export function CriarTemplateModal({ onTemplateCriado }: CriarTemplateModalProps
                 <FormItem>
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Descreva quando este template deve ser usado..." {...field} value={field.value ?? ""} />
+                    <Textarea
+                      placeholder="Descreva quando este template deve ser usado..."
+                      {...field}
+                      value={field.value ?? ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" variant="create" disabled={form.formState.isSubmitting} className="w-full">
+            <Button
+              type="submit"
+              variant="create"
+              disabled={form.formState.isSubmitting}
+              className="w-full"
+            >
               {form.formState.isSubmitting ? "Criando..." : "Criar Template"}
             </Button>
           </form>

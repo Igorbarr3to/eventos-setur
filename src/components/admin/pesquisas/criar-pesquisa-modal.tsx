@@ -258,6 +258,54 @@ export default function CriarPesquisaModal({
                     <legend className="-ml-1 px-1 text-lg font-medium">
                       Detalhes do Projeto/Evento
                     </legend>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="dataInicio"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Data de Início</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="date"
+                                {...field}
+                                value={
+                                  field.value
+                                    ? new Date(field.value)
+                                        .toISOString()
+                                        .split("T")[0]
+                                    : ""
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="dataFim"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Data de Fim</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="date"
+                                {...field}
+                                value={
+                                  field.value
+                                    ? new Date(field.value)
+                                        .toISOString()
+                                        .split("T")[0]
+                                    : ""
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                     <FormField
                       control={form.control}
                       name="tituloProjeto"
@@ -377,54 +425,7 @@ export default function CriarPesquisaModal({
                         </FormItem>
                       )}
                     />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="dataInicio"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Data de Início</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="date"
-                                {...field}
-                                value={
-                                  field.value
-                                    ? new Date(field.value)
-                                        .toISOString()
-                                        .split("T")[0]
-                                    : ""
-                                }
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="dataFim"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Data de Fim</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="date"
-                                {...field}
-                                value={
-                                  field.value
-                                    ? new Date(field.value)
-                                        .toISOString()
-                                        .split("T")[0]
-                                    : ""
-                                }
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                  
                   </fieldset>
                 )}
 

@@ -14,7 +14,7 @@ const templateSchema = z.object({
 // Handler para LISTAR todos os templates de formulário
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user?.role !== 'ADMIN') {
+  if (!session) {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 });
   }
 
@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
 }
 
 // Handler para CRIAR um novo template (o corpo será o mesmo do modal de criação de formulário)
-// Esta é uma funcionalidade avançada que você pode implementar depois.
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session || session.user?.role !== 'ADMIN') {

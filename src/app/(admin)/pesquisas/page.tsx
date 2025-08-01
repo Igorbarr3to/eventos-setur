@@ -11,12 +11,12 @@ async function getPesquisas(): Promise<Pesquisa[]> {
         // Passa o cookie de sessão para a API para autenticação
         Cookie: cookieStore.toString(),
       },
-      cache: 'no-store', // Garante que os dados sejam sempre frescos
+      cache: 'no-store', 
     });
 
     if (!response.ok) {
       console.error(`Falha ao buscar pesquisas. Status: ${response.status}`);
-      return []; // Retorna um array vazio em caso de erro
+      return [];
     }
 
     const data = await response.json();
@@ -24,7 +24,7 @@ async function getPesquisas(): Promise<Pesquisa[]> {
 
   } catch (error) {
     console.error("Erro crítico ao buscar pesquisas:", error);
-    return []; // Retorna um array vazio em caso de falha de rede/execução
+    return [];
   }
 }
 

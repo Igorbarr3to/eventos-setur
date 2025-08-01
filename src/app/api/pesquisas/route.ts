@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Endpoint para listar Pesquisas (Eventos/Projetos)
 export async function GET() {
     try {
         const pesquisas = await prisma.pesquisa.findMany({

@@ -50,9 +50,9 @@ export function PesquisaCard({ pesquisa, onListChange }: PesquisaCardProps) {
           <div className="flex items-center">
             <Calendar className="mr-2 h-4 w-4" />
             <span>
-              {new Date(pesquisa.dataInicio).toLocaleDateString("pt-BR")} a{" "}
+              {new Date(pesquisa.dataInicio).toLocaleDateString("pt-BR", {timeZone: 'UTC'})} {" a "}
               {pesquisa.dataFim
-                ? new Date(pesquisa.dataFim).toLocaleDateString("pt-BR")
+                ? new Date(pesquisa.dataFim).toLocaleDateString("pt-BR", {timeZone: 'UTC'})
                 : ""}
             </span>
           </div>

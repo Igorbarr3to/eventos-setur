@@ -20,7 +20,6 @@ import Image from "next/image";
 
 const navItems = [
   { title: "Home", href: "/dashboard" },
-  { title: "Usuários", href: "/usuarios" },
   { title: "Pesquisas", href: "/pesquisas" },
   { title: "Modelos", href: "/templates" },
 ];
@@ -29,49 +28,49 @@ export function Navbar() {
   const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const userInitials =
-    session?.user?.name
-      ?.split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase() || "U";
+  const getInitialName =
+    session?.user?.name?.split(" ")[0].charAt(0).toUpperCase() || "U";
 
   return (
-    <header className="sticky p-2 top-0 z-50 w-full bg-blue-500/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex items-center justify-between h-full">
-        <Link href="/dashboard" className="flex text-xl gap-2 items-center font-semibold text-white">
-        <Image 
-          src={'/governo-do-estado-ro.svg'}
-          alt="Governo do Estado de Rondônia"
-          width={120}
-          height={80}
-        />
-          MoniTUR
-        </Link>
+    <header className="sticky top-0 z-50 w-full border-b bg-blue-500/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
+        <div className="flex-1">
+          <Link
+            href="/dashboard"
+            className="flex items-center text-xl gap-2 ml-2 font-semibold text-white"
+          >
+            <Image
+              src={"/governo-do-estado-ro.svg"}
+              alt="Governo do Estado de Rondônia"
+              width={120}
+              height={80}
+            />
+            MoniTUR
+          </Link>
+        </div>
 
-        {/* Navegação para Desktop */}
-        <nav className="hidden md:flex items-center gap-4">
+        <nav className="hidden md:flex items-center justify-center gap-2">
           {navItems.map((item) => (
-            <Link key={item.title} href={item.href} className="h-10 rounded-md w-28 flex justify-center items-center text-white font-medium hover:bg-blue-600 transition-colors">
+            <Link
+              key={item.title}
+              href={item.href}
+              className="h-10 rounded-md px-4 py-2 flex justify-center items-center text-white font-medium hover:bg-blue-600 transition-colors"
+            >
               {item.title}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-1 justify-end items-center gap-4 mr-2">
           {/* Menu do Usuário (Desktop) */}
           <div className="hidden md:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="bg-white relative h-10 w-10 rounded-full">
-                  <Avatar>
-                    <AvatarImage
-                      src={session?.user?.image ?? ""}
-                      alt={session?.user?.name ?? ""}
-                    />
-                    <AvatarFallback>{userInitials}</AvatarFallback>
-                  </Avatar>
-                </Button>
+                <Avatar className="bg-white h-10 w-10 cursor-pointer">
+                  <AvatarFallback className="text-xl font-bold text-blue-600">
+                    {getInitialName}
+                  </AvatarFallback>
+                </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-56 bg-zinc-50"
@@ -86,6 +85,16 @@ export function Navbar() {
                     <p className="text-xs leading-none text-muted-foreground">
                       {session?.user?.email}
                     </p>
+                    {session?.user?.role === "ADMIN" && (
+                      <p className="text-xs leading-none text-muted-foreground">
+                        <Link
+                          href="/usuarios"
+                          className="text-xs text-blue-600 hover:underline"
+                        >
+                          Gerenciar usuários
+                        </Link>
+                      </p>
+                    )}
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -99,7 +108,9 @@ export function Navbar() {
           {/* Botão Sanduíche e Menu Mobile (só aparece em telas pequenas) */}
           <div className="md:hidden">
             <Button
+              variant="ghost"
               size="icon"
+              className="text-white hover:bg-blue-600 hover:text-white"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (
@@ -113,24 +124,24 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Conteúdo do Menu Mobile Dropdown */}
+      {/* Conteúdo do Menu Mobile Dropdown (sem alteração) */}
       {isMobileMenuOpen && (
         <div className="md:hidden animate-in fade-in-20 slide-in-from-top-2">
-          <div className="grid grid-cols-2 place-items-center gap-2 p-4">
+          <nav className="grid grid-cols-2 place-items-center gap-2 p-4">
             {navItems.map((item) => (
               <Link
                 key={item.title}
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center text-white rounded-md p-2 text-sm font-medium"
+                className="flex items-center text-white rounded-md p-2 text-sm font-medium hover:bg-blue-600 w-full justify-center"
               >
                 {item.title}
               </Link>
             ))}
+          </nav>
+          <div className="border-t pt-2 p-4">
+            <SingOutButton />
           </div>
-            <div className="border-t pt-2">
-              <SingOutButton />
-            </div>
         </div>
       )}
     </header>

@@ -36,7 +36,7 @@ export async function GET(
 ) {
   // Proteção da rota
   const session = await getServerSession(authOptions);
-  if (!session || session.user?.role !== 'ADMIN') {
+  if (!session) {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 });
   }
 

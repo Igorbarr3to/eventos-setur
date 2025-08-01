@@ -82,7 +82,7 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="createModal" asChild>
+          <Button variant="openModal" asChild>
             <Link href="/pesquisas">Criar Pesquisa</Link>
           </Button>
         </div>

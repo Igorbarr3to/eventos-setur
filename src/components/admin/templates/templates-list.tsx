@@ -14,6 +14,7 @@ import {
 import { CriarTemplateModal } from "./criar-template-modal";
 import { DeletarTemplateBotao } from "./deletar-template-modal";
 import { EditarTemplateModal } from "./editar-template-modal";
+import { FileText } from "lucide-react";
 
 export default function TemplatesList({
   templatesIniciais,
@@ -37,13 +38,29 @@ export default function TemplatesList({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Modelos de Formulários</h1>
+      <div className="flex flex-col justify-between items-center sm:flex-row">
+        <h1 className="text-xl font-bold">Modelos de Formulários</h1>
         <CriarTemplateModal onTemplateCriado={refetchTemplates} />
       </div>
+
+      {templates.length === 0 && (
+        <div className="text-center py-16 border-2 border-dashed rounded-lg">
+          <FileText className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-xl font-semibold">
+            Nenhum modelo encontrado
+          </h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Clique em "Criar Novo Modelo" para começar.
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {templates.map((template) => (
-          <Card key={template.id} className="bg-gray-100 flex flex-col justify-between border-none shadow-xl-t shadow-black transition transform hover:scale-105">
+          <Card
+            key={template.id}
+            className="bg-gray-100 flex flex-col justify-between border-none shadow-xl-t shadow-black transition transform hover:scale-105"
+          >
             <CardHeader>
               <CardTitle>{template.nome}</CardTitle>
               <CardDescription>
