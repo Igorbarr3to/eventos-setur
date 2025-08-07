@@ -1,13 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Users, FileText, BarChart2, CheckSquare } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -15,33 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { RespostasChart } from "@/components/admin/dashboard/respostas-chart";
 import { PesquisasRecentes } from "@/components/admin/dashboard/pesquisas-recentes";
-
-// Componente para os Cards de Estatísticas
-function StatCard({
-  title,
-  value,
-  icon: Icon,
-  className,
-}: {
-  title: string;
-  value: number;
-  icon: React.ElementType;
-  className?: string;
-}) {
-  return (
-    <Card className={`${className} border-none shadow-md shadow-zinc-400`}>
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center text-sm">
-          {title}
-          <Icon className="text-muted-foreground" />
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="text-2xl font-bold">
-        {value}
-      </CardContent>
-    </Card>
-  );
-}
+import EstatisticaCard from "@/components/admin/dashboard/estatisticas-card";
 
 // A página principal do Dashboard - um Server Component assíncrono
 export default async function DashboardPage() {
@@ -71,7 +36,7 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 p-4 ">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold">
@@ -90,29 +55,29 @@ export default async function DashboardPage() {
 
       {/* Cards de Estatísticas */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        <StatCard
+        <EstatisticaCard
           title="Total de Usuários"
           value={totalUsuarios}
           icon={Users}
-          className="bg-blue-300"
+          className="bg-slate-100 text-slate-900"
         />
-        <StatCard
+        <EstatisticaCard
           title="Total de Pesquisas"
           value={totalPesquisas}
           icon={FileText}
-          className="bg-emerald-500"
+          className="bg-indigo-100 text-indigo-900"
         />
-        <StatCard
+        <EstatisticaCard
           title="Total de Respostas"
           value={totalRespostas}
           icon={BarChart2}
-          className="bg-sky-400"
+          className="bg-green-100 text-green-900"
         />
-        <StatCard
+        <EstatisticaCard
           title="Pesquisas Ativas"
           value={pesquisasAtivas}
           icon={CheckSquare}
-          className="bg-yellow-400"
+          className="bg-amber-100 text-amber-900"
         />
       </div>
 
