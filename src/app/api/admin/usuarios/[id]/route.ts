@@ -65,7 +65,10 @@ export async function PATCH(
     }
 
     try {
-        const userId = parseInt(params.id, 10);
+
+        const {id} = await params;
+
+        const userId = parseInt(id, 10);
         if (isNaN(userId)) {
             return NextResponse.json({ message: 'ID de usuário inválido.' }, { status: 400 });
         }

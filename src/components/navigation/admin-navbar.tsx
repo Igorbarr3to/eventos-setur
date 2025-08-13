@@ -45,7 +45,7 @@ export function Navbar() {
               width={120}
               height={80}
             />
-            MoniTUR
+            SETUR Pesquisas
           </Link>
         </div>
 

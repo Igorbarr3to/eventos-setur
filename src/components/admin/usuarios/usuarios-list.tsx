@@ -20,7 +20,7 @@ export default function UsuariosList({ usuariosIniciais }: UsuariosListProps) {
   const refetchUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/admin/users');
+      const response = await fetch('/api/admin/usuarios');
       if (!response.ok) throw new Error('Erro ao buscar usuários');
       const data = await response.json();
       setUsers(data);

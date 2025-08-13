@@ -4,7 +4,7 @@ import TemplatesList from "@/components/admin/templates/templates-list";
 
 async function getTemplates() {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/templates`, {
       headers: { Cookie: cookieStore.toString() },
       cache: 'no-store',
