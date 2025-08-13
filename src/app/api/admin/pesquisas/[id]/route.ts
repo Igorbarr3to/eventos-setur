@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { PesquisaStatus, PesquisaTipo } from "@prisma/client";
@@ -32,7 +32,7 @@ const editPesquisaSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Proteção da rota
   const session = await getServerSession(authOptions);
@@ -41,7 +41,8 @@ export async function GET(
   }
 
   try {
-    const pesquisaId = parseInt(params.id, 10);
+    const id = (await params).id;
+    const pesquisaId = parseInt(id, 10);
     if (isNaN(pesquisaId)) {
       return NextResponse.json({ message: 'ID da pesquisa inválido.' }, { status: 400 });
     }
@@ -67,7 +68,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Proteção da rota
   const session = await getServerSession(authOptions);
@@ -76,7 +77,8 @@ export async function PATCH(
   }
 
   try {
-    const pesquisaId = parseInt(params.id, 10);
+    const id = (await params).id;
+    const pesquisaId = parseInt(id, 10);
     if (isNaN(pesquisaId)) {
       return NextResponse.json({ message: 'ID da pesquisa inválido.' }, { status: 400 });
     }
@@ -104,7 +106,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Proteção da rota
   const session = await getServerSession(authOptions);
@@ -113,7 +115,8 @@ export async function DELETE(
   }
 
   try {
-    const pesquisaId = parseInt(params.id, 10);
+    const id = (await params).id;
+    const pesquisaId = parseInt(id, 10);
     if (isNaN(pesquisaId)) {
       return NextResponse.json({ message: 'ID da pesquisa inválido.' }, { status: 400 });
     }

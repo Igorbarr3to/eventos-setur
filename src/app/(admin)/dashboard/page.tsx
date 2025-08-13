@@ -3,7 +3,7 @@ import { Users, FileText, BarChart2, CheckSquare } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { RespostasChart } from "@/components/admin/dashboard/respostas-chart";
 import { PesquisasRecentes } from "@/components/admin/dashboard/pesquisas-recentes";
 import EstatisticaCard from "@/components/admin/dashboard/estatisticas-card";

@@ -21,6 +21,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+export type PageProps = Promise<{id: string}>
+
 async function getPesquisaById(id: string): Promise<Pesquisa | null> {
   try {
     const cookieStore = cookies();
@@ -48,12 +50,9 @@ async function getPesquisaById(id: string): Promise<Pesquisa | null> {
 }
 
 // A página recebe 'params' como prop, que contém o 'id' da URL
-export default async function PaginaDetalhePesquisa({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const pesquisa = await getPesquisaById(params.id);
+export default async function PaginaDetalhePesquisa(props: {params: PageProps}) {
+  const { id } = await props.params;
+  const pesquisa = await getPesquisaById(id);
 
   // Se a pesquisa não for encontrada, exibe a página de 404 padrão do Next.js
   if (!pesquisa) {

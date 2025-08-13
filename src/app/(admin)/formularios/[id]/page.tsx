@@ -1,29 +1,45 @@
-// app/admin/formularios/[id]/page.tsx
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { Formulario, Pergunta } from "@prisma/client";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { GerenciadorDePerguntas } from "@/components/admin/perguntas/gerenciador-perguntas";
+import { prisma } from "@/lib/prisma";
 
 type FormularioComPerguntas = Formulario & { perguntas: Pergunta[] };
 
-async function getFormulario(id: string): Promise<FormularioComPerguntas | null> {
+export type PageProps = Promise<{id: string}>
+
+async function getFormulario(
+  id: string
+): Promise<FormularioComPerguntas | null> {
   try {
-    const cookieStore = cookies();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/public/formularios/${id}`, {
-      headers: { Cookie: cookieStore.toString() },
-      cache: 'no-store',
+    const formularioId = parseInt(id, 10);
+    if (isNaN(formularioId)) return null;
+
+    const formulario = await prisma.formulario.findUnique({
+      where: { id: formularioId },
+      include: {
+        perguntas: {
+          orderBy: { ordem: "asc" },
+        },
+      },
     });
-    if (!response.ok) return null;
-    return response.json();
+    return formulario;
   } catch (error) {
     console.error("Falha ao buscar formulário:", error);
     return null;
   }
 }
 
-export default async function PaginaGerenciarPerguntas({ params }: { params: { id: string } }) {
-  const formulario = await getFormulario(params.id);
+export default async function PaginaGerenciarPerguntas(props: {params: PageProps}) {
+  const { id } = await props.params;
+  const formulario = await getFormulario(id);
 
   if (!formulario) {
     notFound();
@@ -38,7 +54,9 @@ export default async function PaginaGerenciarPerguntas({ params }: { params: { i
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/pesquisas/${formulario.pesquisaId}`}>Formulários</BreadcrumbLink>
+            <BreadcrumbLink href={`/pesquisas/${formulario.pesquisaId}`}>
+              Formulários
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -46,7 +64,7 @@ export default async function PaginaGerenciarPerguntas({ params }: { params: { i
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      
+
       {/* O Client Component recebe os dados iniciais */}
       <GerenciadorDePerguntas formularioInicial={formulario} />
     </div>

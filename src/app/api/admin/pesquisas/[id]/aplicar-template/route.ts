@@ -1,7 +1,7 @@
 // app/api/admin/pesquisas/[id]/aplicar-template/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma, } from "@/lib/prisma";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
@@ -12,7 +12,7 @@ const aplicarTemplateSchema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session || session.user?.role !== 'ADMIN') {
@@ -20,7 +20,8 @@ export async function POST(
   }
 
   try {
-    const pesquisaId = parseInt(params.id);
+    const id = (await params).id;
+    const pesquisaId = parseInt(id);
     const json = await request.json();
     const data = aplicarTemplateSchema.parse(json);
 

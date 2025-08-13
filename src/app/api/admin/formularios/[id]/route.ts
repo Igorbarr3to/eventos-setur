@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { FormularioTipo } from "@prisma/client";
@@ -18,7 +18,7 @@ const editFormularioSchema = z.object({
 // --- Handler PATCH: Atualizar um formulário ---
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session || session.user?.role !== 'ADMIN') {
@@ -26,7 +26,8 @@ export async function PATCH(
   }
 
   try {
-    const formularioId = parseInt(params.id, 10);
+    const id = (await params).id;
+    const formularioId = parseInt(id, 10);
     const json = await request.json();
     const data = editFormularioSchema.parse(json);
 
@@ -47,7 +48,7 @@ export async function PATCH(
 // --- Handler DELETE: Excluir um formulário ---
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session || session.user?.role !== 'ADMIN') {
@@ -55,7 +56,8 @@ export async function DELETE(
   }
 
   try {
-    const formularioId = parseInt(params.id, 10);
+    const id = (await params).id;
+    const formularioId = parseInt(id, 10);
 
     // O onDelete: Cascade no schema cuidará de excluir as perguntas e respostas associadas.
     await prisma.formulario.delete({

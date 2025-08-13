@@ -58,7 +58,6 @@ export interface BackendPesquisa {
   status?: PesquisaStatus; // 'planejado' | 'em_andamento' | 'concluido' | 'cancelado'
 }
 
-
 export interface BackendFormulario {
   id: number;
   nome: string;

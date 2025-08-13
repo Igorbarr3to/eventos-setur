@@ -5,6 +5,7 @@ import { FormularioTemplate, PerguntaTemplate } from "@prisma/client";
 import { GerenciadorDePerguntasTemplate } from "@/components/admin/templates/gerenciador-de-perguntas";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
+export type PageProps = Promise<{id: string}>
 // Tipo para incluir as perguntas
 type TemplateComPerguntas = FormularioTemplate & { perguntas: PerguntaTemplate[] };
 
@@ -24,8 +25,9 @@ async function getTemplate(id: string): Promise<TemplateComPerguntas | null> {
   }
 }
 
-export default async function PaginaGerenciarTemplate({ params }: { params: { id: string } }) {
-  const template = await getTemplate(params.id);
+export default async function PaginaGerenciarTemplate(props: { params: PageProps }) {
+ const { id } = await props.params;
+  const template = await getTemplate(id);
 
   if (!template) {
     notFound();

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { FormularioTipo } from "@prisma/client";
@@ -15,7 +15,7 @@ const editTemplateSchema = z.object({
 // --- Handler GET: Buscar um template e suas perguntas ---
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -23,7 +23,8 @@ export async function GET(
   }
 
   try {
-    const templateId = parseInt(params.id, 10);
+    const id = (await params).id;
+    const templateId = parseInt(id, 10);
     const template = await prisma.formularioTemplate.findUnique({
       where: { id: templateId },
       include: { perguntas: { orderBy: { ordem: 'asc' } } },
@@ -41,7 +42,7 @@ export async function GET(
 // --- Handler PATCH: Editar um template ---
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // 1. Proteção da rota
   const session = await getServerSession(authOptions);
@@ -50,7 +51,8 @@ export async function PATCH(
   }
 
   try {
-    const templateId = parseInt(params.id, 10);
+    const id = (await params).id;
+    const templateId = parseInt(id, 10);
     const json = await request.json();
     
     // 2. Validação dos dados
@@ -79,7 +81,7 @@ export async function PATCH(
 // --- Handler DELETE: Excluir um template ---
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // 1. Proteção da rota
   const session = await getServerSession(authOptions);
@@ -88,7 +90,8 @@ export async function DELETE(
   }
 
   try {
-    const templateId = parseInt(params.id, 10);
+    const id = (await params).id;
+    const templateId = parseInt(id, 10);
 
     // 2. Lógica de exclusão no banco
     // Graças ao 'onDelete: Cascade' no schema, o Prisma também excluirá

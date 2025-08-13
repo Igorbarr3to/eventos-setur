@@ -29,6 +29,8 @@ interface RespostaCompleta {
   detalhes: DetalheResposta[];
 }
 
+export type PageProps = Promise<{id: string}>
+
 // Função para buscar os dados no servidor
 async function getRespostas(pesquisaId: string): Promise<RespostaCompleta[]> {
   try {
@@ -71,12 +73,8 @@ async function getPesquisa(pesquisaId: string): Promise<Pesquisa | null> {
   }
 }
 
-export default async function PaginaResultados({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = await params;
+export default async function PaginaResultados(props: {params: PageProps}) {
+  const { id } = await props.params;
 
   const [pesquisa, respostas] = await Promise.all([
     await getPesquisa(id),
