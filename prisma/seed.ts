@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Iniciando o script de seed...");
 
-  const adminEmail = 'admin@admin.com';
-  const plainPassword = ''; // 👈 TROQUE AQUI POR UMA SENHA FORTE
+  const adminEmail = process.env.SEED_ADMIN_EMAIL;
+  const plainPassword = process.env.SEED_ADMIN_PASSWORD as string; 
 
   // Verifica se o usuário administrador já existe para não criar duplicatas
   const existingAdmin = await prisma.user.findUnique({
