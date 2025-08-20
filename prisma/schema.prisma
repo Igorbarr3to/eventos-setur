@@ -105,11 +105,14 @@ model Pergunta {
   id           Int          @id @default(autoincrement())
   formularioId Int          @map("formulario_id")
   formulario   Formulario   @relation(fields: [formularioId], references: [id], onDelete: Cascade)
+  
   texto        String       @db.Text
   tipoResposta TipoResposta @map("tipo_resposta")
   opcoesJson   Json?        @map("opcoes_json") // JSON para opções de múltipla escolha ou escala
   obrigatoria  Boolean      @default(false)
+  incluirOpcaoOutro Boolean @default(false) @map("incluir_opcao_outro")
   ordem        Int? // Ordem da pergunta no formulário
+
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
@@ -185,6 +188,7 @@ model PerguntaTemplate {
   tipoResposta   TipoResposta @map("tipo_resposta")
   opcoesJson     Json?    @map("opcoes_json")
   obrigatoria    Boolean  @default(false)
+  incluirOpcaoOutro Boolean @default(false) @map("incluir_opcao_outro")
   ordem          Int?
 
   createdAt      DateTime @default(now()) @map("created_at")

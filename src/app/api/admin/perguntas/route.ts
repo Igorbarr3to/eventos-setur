@@ -11,6 +11,7 @@ const createPerguntaSchema = z.object({
   texto: z.string().min(1, "O texto da pergunta é obrigatório."),
   tipoResposta: z.nativeEnum(TipoResposta),
   obrigatoria: z.boolean().default(false),
+   incluirOpcaoOutro: z.boolean().optional().default(false),
   opcoesJson: z.any().optional().nullable(), // Aceita qualquer estrutura JSON
   ordem: z.number().int().optional(),
 });

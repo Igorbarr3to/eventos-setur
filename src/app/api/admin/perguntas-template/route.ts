@@ -9,6 +9,7 @@ const createPerguntaTemplateSchema = z.object({
   templateId: z.number().int(),
   texto: z.string().min(1, "O texto da pergunta é obrigatório."),
   tipoResposta: z.nativeEnum(TipoResposta),
+  incluirOpcaoOutro: z.boolean().optional().default(false),
   obrigatoria: z.boolean().default(false),
   opcoesJson: z.any().optional().nullable(),
   ordem: z.number().int().optional(),

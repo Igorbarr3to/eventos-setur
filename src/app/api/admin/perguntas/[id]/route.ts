@@ -10,48 +10,64 @@ const editPerguntaSchema = z.object({
   texto: z.string().min(1).optional(),
   tipoResposta: z.nativeEnum(TipoResposta).optional(),
   obrigatoria: z.boolean().optional(),
+  incluirOpcaoOutro: z.boolean().optional().default(false),
   opcoesJson: z.any().optional().nullable(),
   ordem: z.number().int().optional(),
 });
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user?.role !== 'ADMIN') {
-        return NextResponse.json({ message: 'Não autorizado' }, { status: 401 });
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== "ADMIN") {
+    return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+  }
+
+  try {
+    const id = (await params).id;
+    const perguntaId = parseInt(id);
+    const json = await request.json();
+    const data = editPerguntaSchema.parse(json);
+
+    const updatedPergunta = await prisma.pergunta.update({
+      where: { id: perguntaId },
+      data: data,
+    });
+
+    return NextResponse.json(updatedPergunta);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { message: "Dados inválidos", issues: error.issues },
+        { status: 400 }
+      );
     }
-
-    try {
-        const id = (await params).id;
-        const perguntaId = parseInt(id);
-        const json = await request.json();
-        const data = editPerguntaSchema.parse(json);
-
-        const updatedPergunta = await prisma.pergunta.update({
-            where: { id: perguntaId },
-            data: data,
-        });
-
-        return NextResponse.json(updatedPergunta);
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            return NextResponse.json({ message: 'Dados inválidos', issues: error.issues }, { status: 400 });
-        }
-        return NextResponse.json({ message: 'Erro interno do servidor.' }, { status: 500 });
-    }
+    return NextResponse.json(
+      { message: "Erro interno do servidor." },
+      { status: 500 }
+    );
+  }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user?.role !== 'ADMIN') {
-        return NextResponse.json({ message: 'Não autorizado' }, { status: 401 });
-    }
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== "ADMIN") {
+    return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+  }
 
-    try {
-        const id = (await params).id;
-        const perguntaId = parseInt(id);
-        await prisma.pergunta.delete({ where: { id: perguntaId } });
-        return NextResponse.json({ message: 'Pergunta excluída com sucesso.' });
-    } catch (error) {
-        return NextResponse.json({ message: 'Erro interno do servidor.' }, { status: 500 });
-    }
+  try {
+    const id = (await params).id;
+    const perguntaId = parseInt(id);
+    await prisma.pergunta.delete({ where: { id: perguntaId } });
+    return NextResponse.json({ message: "Pergunta excluída com sucesso." });
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Erro interno do servidor." },
+      { status: 500 }
+    );
+  }
 }

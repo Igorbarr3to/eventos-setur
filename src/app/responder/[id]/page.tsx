@@ -25,11 +25,14 @@ type FormularioComPerguntas = Formulario & { perguntas: Pergunta[] };
 function RenderizarPergunta({
   pergunta,
   control,
+  watch,
 }: {
   pergunta: Pergunta;
   control: any;
+  watch: any;
 }) {
   const opcoes = pergunta.opcoesJson as { opcoes?: string[] };
+  const valorSelecionado = watch(`respostas.${pergunta.id}`);
 
   return (
     <FormField
@@ -43,6 +46,7 @@ function RenderizarPergunta({
             )}
             {pergunta.texto}
           </FormLabel>
+
           <FormControl className="">
             {(() => {
               switch (pergunta.tipoResposta) {
@@ -63,7 +67,9 @@ function RenderizarPergunta({
                     />
                   );
                 case TipoResposta.DATA:
-                  return <Input type="date" {...field} />;
+                  return <Input type="date" {...field} 
+                />;
+
                 case TipoResposta.OPCAO:
                   if (!opcoes?.opcoes) return null;
                   return (
@@ -83,6 +89,31 @@ function RenderizarPergunta({
                           <FormLabel className="font-normal">{opcao}</FormLabel>
                         </FormItem>
                       ))}
+
+                      {pergunta.incluirOpcaoOutro && (
+                        <div className="flex items-center space-x-3">
+                          <FormControl>
+                            <RadioGroupItem value="outro_texto" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Outro:</FormLabel>
+                          {/* O campo de texto só aparece se "Outro" estiver selecionado */}
+                          {valorSelecionado === "outro_texto" && (
+                            <FormField
+                              control={control}
+                              name={`respostas.${pergunta.id}_outro`} // Campo separado para o texto
+                              render={({ field: outroField }) => (
+                                <FormControl>
+                                  <Input
+                                    placeholder="Qual?"
+                                    {...outroField}
+                                    className="flex-1"
+                                  />
+                                </FormControl>
+                              )}
+                            />
+                          )}
+                        </div>
+                      )}
                     </RadioGroup>
                   );
                 case TipoResposta.MULTIPLA:
@@ -169,16 +200,37 @@ export default function PaginaDeResposta() {
   const onSubmit = async (data: any) => {
     if (!formulario) return;
 
+    // Adicione o estado de "enviando"
+    // const [isSubmitting, setIsSubmitting] = useState(false);
+    // setIsSubmitting(true);
+
     try {
-      // 1. Transforma os dados do formulário para o formato que a API espera
+      // 1. Transforma os dados do formulário DIRETAMENTE para o formato que a API espera
       const respostasDetalhes = formulario.perguntas
         .map((pergunta) => {
-          const valor = data.respostas?.[pergunta.id];
-          if (valor === undefined || valor === null || valor === "")
+          // Pega o valor da resposta principal e do campo "outro" (se existir)
+          let valor = data.respostas?.[pergunta.id];
+          const textoOutro = data.respostas?.[`${pergunta.id}_outro`];
+
+          // Lógica para a opção "Outro": Se a opção "outro_texto" foi marcada e
+          // o campo de texto foi preenchido, use o texto como o valor final.
+          if (valor === "outro_texto" && textoOutro) {
+            valor = textoOutro;
+          }
+
+          // Ignora a resposta se ela for vazia, nula ou ainda for "outro_texto" (sem preenchimento)
+          if (
+            valor === undefined ||
+            valor === null ||
+            valor === "" ||
+            valor === "outro_texto"
+          ) {
             return null;
+          }
 
           const detalhe: any = { perguntaId: pergunta.id };
 
+          // Mapeia o valor para a coluna correta do banco de dados (valorTexto, valorNumero, etc.)
           switch (pergunta.tipoResposta) {
             case "TEXTO":
               detalhe.valorTexto = String(valor);
@@ -190,7 +242,7 @@ export default function PaginaDeResposta() {
             case "DATA":
               detalhe.valorData = new Date(valor).toISOString();
               break;
-            case "OPCAO":
+            case "OPCAO": // O valor já é o texto da opção, incluindo o "Outro"
               detalhe.valorOpcao = String(valor);
               break;
             case "MULTIPLA":
@@ -201,17 +253,17 @@ export default function PaginaDeResposta() {
           }
           return detalhe;
         })
-        .filter(Boolean); // Remove respostas nulas/vazias
+        .filter(Boolean); // Remove qualquer resposta que resultou em 'null'
 
-      // 2. Monta o payload final
+      // 2. Monta o payload final para a API
       const payload = {
         pesquisaId: formulario.pesquisaId,
         formularioId: formulario.id,
         respostasDetalhes: respostasDetalhes,
       };
 
-      // 3. Envia para a sua API existente
-      const response = await fetch("/api/public/respostas", {
+      // 3. Envia para a API correta (/api/respostas)
+      const response = await fetch("/api/respostas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -224,9 +276,11 @@ export default function PaginaDeResposta() {
         );
       }
 
-      setSuccess(true);
+      // setSuccess(true); // Supondo que você tenha esse estado
     } catch (err: any) {
-      toast.error(err.message);
+      // toast.error(err.message); // Supondo que você use toasts
+    } finally {
+      // setIsSubmitting(false);
     }
   };
 
@@ -280,6 +334,7 @@ export default function PaginaDeResposta() {
                 key={pergunta.id}
                 pergunta={pergunta}
                 control={form.control}
+                watch={form.watch}
               />
             ))}
             <Button

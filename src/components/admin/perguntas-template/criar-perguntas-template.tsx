@@ -41,6 +41,7 @@ const formSchema = z
     texto: z.string().min(3, { message: "O texto da pergunta é obrigatório." }),
     tipoResposta: z.nativeEnum(TipoResposta),
     obrigatoria: z.boolean(),
+    incluirOpcaoOutro: z.boolean(),
     opcoesMultiplas: z.array(z.object({ texto: z.string() })).optional(),
     opcoesEscala: z
       .object({
@@ -93,6 +94,7 @@ export function CriarPerguntaTemplateModal({
       texto: "",
       tipoResposta: TipoResposta.TEXTO,
       obrigatoria: false,
+      incluirOpcaoOutro: false,
       opcoesMultiplas: [{ texto: "" }],
       opcoesEscala: { min: 1, max: 5, labelMin: "Ruim", labelMax: "Ótimo" },
     },
@@ -125,6 +127,7 @@ export function CriarPerguntaTemplateModal({
       texto: data.texto,
       tipoResposta: data.tipoResposta,
       obrigatoria: data.obrigatoria,
+      incluirOpcaoOutro: data.incluirOpcaoOutro,
       opcoesJson: opcoesJson,
       templateId: templateId,
     };
@@ -135,8 +138,6 @@ export function CriarPerguntaTemplateModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      console.log(response);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -149,7 +150,6 @@ export function CriarPerguntaTemplateModal({
       onPerguntaCriada();
     } catch (error: any) {
       toast.error(error.message);
-      console.error(error);
     }
   };
 
@@ -215,6 +215,28 @@ export function CriarPerguntaTemplateModal({
               )}
             />
 
+            {tipoSelecionado === "OPCAO" && (
+              <FormField
+                control={form.control}
+                name="incluirOpcaoOutro"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        Incluir opção "Outro" com campo de texto?
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            )}
+
             {/* --- CAMPOS DINÂMICOS COM BASE NO TIPO --- */}
 
             {(tipoSelecionado === "OPCAO" ||
@@ -258,66 +280,6 @@ export function CriarPerguntaTemplateModal({
                 >
                   <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Opção
                 </Button>
-              </div>
-            )}
-
-            {tipoSelecionado === "ESCALA" && (
-              <div className="space-y-4 p-4 border rounded-md">
-                <FormLabel>Configuração da Escala</FormLabel>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="opcoesEscala.min"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mínimo</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="opcoesEscala.max"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Máximo</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="opcoesEscala.labelMin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Label Mínimo</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Ex: Ruim" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="opcoesEscala.labelMax"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Label Máximo</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Ex: Ótimo" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
               </div>
             )}
 
