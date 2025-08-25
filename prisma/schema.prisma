@@ -126,8 +126,6 @@ enum TipoResposta {
   NUMERO
   OPCAO // Para radio buttons (uma única escolha)
   MULTIPLA // Para checkboxes (múltiplas escolhas)
-  ESCALA
-  DATA
 }
 
 model Resposta {

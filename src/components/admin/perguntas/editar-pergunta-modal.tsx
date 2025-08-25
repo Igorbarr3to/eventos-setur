@@ -43,14 +43,6 @@ const formSchema = z
     obrigatoria: z.boolean(),
     incluirOpcaoOutro: z.boolean().default(false).optional(),
     opcoesMultiplas: z.array(z.object({ texto: z.string() })).optional(),
-    opcoesEscala: z
-      .object({
-        min: z.coerce.number(),
-        max: z.coerce.number(),
-        labelMin: z.string().optional(),
-        labelMax: z.string().optional(),
-      })
-      .optional(),
   })
 
   .refine(
@@ -116,14 +108,7 @@ export function EditarPerguntaModal({
           defaultValues.opcoesMultiplas = Array.isArray(opcoes)
             ? opcoes.map((opt: string) => ({ texto: opt }))
             : [];
-        } else if (pergunta.tipoResposta === "ESCALA") {
-          defaultValues.opcoesEscala = {
-            min: escala.min ?? 1,
-            max: escala.max ?? 5,
-            labelMin: escala.label_min ?? "",
-            labelMax: escala.label_max ?? "",
-          };
-        }
+        } 
       }
 
       form.reset(defaultValues);
@@ -138,14 +123,8 @@ export function EditarPerguntaModal({
       opcoesJson = {
         opcoes: data.opcoesMultiplas?.map((opt) => opt.texto).filter(Boolean),
       };
-    } else if (tipoSelecionado === "ESCALA") {
-      opcoesJson = {
-        min: data.opcoesEscala?.min,
-        max: data.opcoesEscala?.max,
-        label_min: data.opcoesEscala?.labelMin,
-        label_max: data.opcoesEscala?.labelMax,
-      };
     }
+    
     const payload = {
       texto: data.texto,
       tipoResposta: data.tipoResposta,

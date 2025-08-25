@@ -12,7 +12,7 @@ type TemplateComPerguntas = FormularioTemplate & { perguntas: PerguntaTemplate[]
 // Função para buscar o template e suas perguntas no servidor
 async function getTemplate(id: string): Promise<TemplateComPerguntas | null> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/templates/${id}`, {
       headers: { Cookie: cookieStore.toString() },
       cache: 'no-store',

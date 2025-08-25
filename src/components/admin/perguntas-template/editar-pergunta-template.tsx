@@ -21,14 +21,7 @@ const formSchema = z.object({
   tipoResposta: z.nativeEnum(TipoResposta),
   obrigatoria: z.boolean(),
   opcoesMultiplas: z.array(z.object({ texto: z.string() })).optional(),
-  opcoesEscala: z.object({
-    min: z.coerce.number(),
-    max: z.coerce.number(),
-    labelMin: z.string().optional(),
-    labelMax: z.string().optional(),
-  }).optional(),
 })
-
   .refine((data) => {
     if (data.tipoResposta === 'OPCAO' || data.tipoResposta === 'MULTIPLA') {
       return (
@@ -81,13 +74,6 @@ export function EditarPerguntaTemplateModal({ pergunta, onPerguntaEditada }: Edi
         defaultValues.opcoesMultiplas = Array.isArray(opcoes)
           ? opcoes.map((opt: string) => ({ texto: opt }))
           : [];
-      } else if (pergunta.tipoResposta === 'ESCALA') {
-        defaultValues.opcoesEscala = {
-          min: escala.min ?? 1,
-          max: escala.max ?? 5,
-          labelMin: escala.label_min ?? "",
-          labelMax: escala.label_max ?? "",
-        };
       }
     }
 
@@ -101,14 +87,8 @@ export function EditarPerguntaTemplateModal({ pergunta, onPerguntaEditada }: Edi
     let opcoesJson = null;
     if (tipoSelecionado === 'OPCAO' || tipoSelecionado === 'MULTIPLA') {
       opcoesJson = { opcoes: data.opcoesMultiplas?.map(opt => opt.texto).filter(Boolean) };
-    } else if (tipoSelecionado === 'ESCALA') {
-      opcoesJson = { 
-        min: data.opcoesEscala?.min, 
-        max: data.opcoesEscala?.max, 
-        label_min: data.opcoesEscala?.labelMin, 
-        label_max: data.opcoesEscala?.labelMax 
-      };
-    }
+    } 
+
     const payload = { 
       texto: data.texto, 
       tipoResposta: data.tipoResposta, 
@@ -219,58 +199,6 @@ export function EditarPerguntaTemplateModal({ pergunta, onPerguntaEditada }: Edi
                 >
                   <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Opção
                 </Button>
-              </div>
-            )}
-
-            {tipoSelecionado === 'ESCALA' && (
-              <div className="space-y-4 p-4 border rounded-md">
-                <FormLabel>Configuração da Escala</FormLabel>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="opcoesEscala.min"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mínimo</FormLabel>
-                        <FormControl><Input type="number" {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="opcoesEscala.max"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Máximo</FormLabel>
-                        <FormControl><Input type="number" {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="opcoesEscala.labelMin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Label Mínimo</FormLabel>
-                        <FormControl><Input placeholder="Ex: Ruim" {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="opcoesEscala.labelMax"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Label Máximo</FormLabel>
-                        <FormControl><Input placeholder="Ex: Ótimo" {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
               </div>
             )}
 

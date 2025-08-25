@@ -43,14 +43,6 @@ const formSchema = z
     obrigatoria: z.boolean(),
     incluirOpcaoOutro: z.boolean(),
     opcoesMultiplas: z.array(z.object({ texto: z.string() })).optional(),
-    opcoesEscala: z
-      .object({
-        min: z.coerce.number(),
-        max: z.coerce.number(),
-        labelMin: z.string().optional(),
-        labelMax: z.string().optional(),
-      })
-      .optional(),
   })
   // Lógica de validação condicional
   .refine(
@@ -96,7 +88,6 @@ export function CriarPerguntaTemplateModal({
       obrigatoria: false,
       incluirOpcaoOutro: false,
       opcoesMultiplas: [{ texto: "" }],
-      opcoesEscala: { min: 1, max: 5, labelMin: "Ruim", labelMax: "Ótimo" },
     },
   });
 
@@ -113,13 +104,6 @@ export function CriarPerguntaTemplateModal({
     if (tipoSelecionado === "OPCAO" || tipoSelecionado === "MULTIPLA") {
       opcoesJson = {
         opcoes: data.opcoesMultiplas?.map((opt) => opt.texto).filter(Boolean),
-      };
-    } else if (tipoSelecionado === "ESCALA") {
-      opcoesJson = {
-        min: data.opcoesEscala?.min,
-        max: data.opcoesEscala?.max,
-        label_min: data.opcoesEscala?.labelMin,
-        label_max: data.opcoesEscala?.labelMax,
       };
     }
 

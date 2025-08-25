@@ -25,8 +25,6 @@ export enum TipoResposta {
   NUMERO = 'NUMERO',
   OPCAO = 'OPCAO', // Para rádio buttons (uma única escolha)
   MULTIPLA = 'MULTIPLA', // Para checkboxes (múltiplas escolhas)
-  ESCALA = 'ESCALA',
-  DATA = 'DATA',
 }
 
 export interface BackendPesquisa {
