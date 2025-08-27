@@ -21,7 +21,6 @@ export function AplicarTemplateModal({ pesquisaId, onFormularioCriado }: Aplicar
 
   useEffect(() => {
     if (open) {
-      // Busca a lista de templates disponíveis quando o modal abre
       const fetchTemplates = async () => {
         const response = await fetch('/api/admin/templates');
         const data = await response.json();
@@ -59,7 +58,7 @@ export function AplicarTemplateModal({ pesquisaId, onFormularioCriado }: Aplicar
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Usar modelo</Button>
+        <Button className="bg-blue-400 hover:bg-blue-200">Usar modelo</Button>
       </DialogTrigger>
       <DialogContent className="bg-white">
         <DialogHeader>
@@ -68,10 +67,10 @@ export function AplicarTemplateModal({ pesquisaId, onFormularioCriado }: Aplicar
         <div className="space-y-4 py-4">
           <Label htmlFor="template-select">Selecione um modelo</Label>
           <Select onValueChange={setSelectedTemplateId}>
-            <SelectTrigger id="template-select">
+            <SelectTrigger id="template-select" className="w-full">
               <SelectValue placeholder="Escolha um modelo..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-zinc-200">
               {templates.map(template => (
                 <SelectItem key={template.id} value={String(template.id)}>
                   {template.nome}
@@ -81,7 +80,7 @@ export function AplicarTemplateModal({ pesquisaId, onFormularioCriado }: Aplicar
           </Select>
         </div>
         <div className="flex justify-end">
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
+          <Button onClick={handleSubmit} disabled={isSubmitting} variant={"create"}>
             {isSubmitting ? "Aplicando..." : "Aplicar Template"}
           </Button>
         </div>

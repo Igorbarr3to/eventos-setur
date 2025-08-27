@@ -52,7 +52,7 @@ export function FormulariosList({ pesquisaId }: FormulariosListProps) {
     <div className="space-y-4 w-full">
       <div className="flex flex-col sm:flex-row justify-between items-center">
         <h2 className="text-2xl font-semibold">Formulários da Pesquisa</h2>
-        <div className="space-y-2 sm:space-x-4">
+        <div className="flex gap-2 space-y-2 sm:space-x-4">
           <AplicarTemplateModal
             pesquisaId={pesquisaId}
             onFormularioCriado={refetchFormularios}
