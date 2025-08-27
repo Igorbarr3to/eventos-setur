@@ -17,30 +17,29 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+RUN pnpm exec prisma generate
+
+RUN pnpm build
+
+
 # --- Estágio 4: Produção (IMAGEM FINAL) ---
 # Este é o estágio final, que resulta na imagem que irá para o servidor.
 FROM base AS prod
 WORKDIR /app
-
 # Instala SOMENTE as dependências de produção, resultando em uma imagem menor.
 RUN pnpm install --prod
-
 # Copia os arquivos essenciais do estágio 'builder'.
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/prisma ./prisma
-
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
-
 # Expõe a porta que o servidor de produção do Next.js usa.
 EXPOSE 3000
-
 # Comando para iniciar o servidor de produção.
 CMD ["pnpm", "start"]
 
-# --- Estágio de Desenvolvimento ---
-# Este estágio é usado pelo docker-compose local para hot-reloading.
+
 FROM base AS dev
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules

@@ -15,7 +15,7 @@ services:
 
   postgres:
     image: postgres:15
-    container_name: monitur-pesquisas-db
+    container_name: monitur-pesquisas-db-prod
     restart: unless-stopped
     ports:
       - "5432:5432"
