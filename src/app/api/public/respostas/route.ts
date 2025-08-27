@@ -1,102 +1,76 @@
-// app/api/respostas/route.ts
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { TipoResposta } from '../../../../../types/types'; 
 
-// Zod Schema para validar os detalhes de uma resposta individual
-const respostaDetalheSchema = z.object({
-    perguntaId: z.number().int(),
-    valorTexto: z.string().optional().nullable(),
-    valorNumero: z.number().optional().nullable(),
-    valorData: z.string().datetime().optional().nullable(), // Espera ISO string
-    valorOpcao: z.string().optional().nullable(), // Para radio ou múltiplos como string
-});
-
-// Zod Schema para a submissão completa do formulário
-const frontendSubmissionDataSchema = z.object({
-    formularioId: z.number().int(),
-    pesquisaId: z.number().int(),
-    respostasDetalhes: z.array(respostaDetalheSchema),
-    // ip e userAgent serão coletados no backend, não vêm do frontend
+const publicSubmissionSchema = z.object({
+  formularioId: z.number().int(),
+  respostas: z.record(z.any()),
 });
 
 export async function POST(request: NextRequest) {
-    try {
-        const json = await request.json();
-        const data = frontendSubmissionDataSchema.parse(json); // Valida a entrada do frontend
+  try {
+    const json = await request.json();
+    const data = publicSubmissionSchema.parse(json);
 
-        // Coletar IP e User-Agent do request
-        const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || null;
-        const userAgent = request.headers.get('user-agent') || null;
+    const formulario = await prisma.formulario.findUnique({
+        where: { id: data.formularioId },
+        include: { perguntas: true },
+    });
 
-        // 1. Criar o registro de cabeçalho da Resposta
-        const novaResposta = await prisma.resposta.create({
+    if (!formulario) {
+        return NextResponse.json({ message: "Formulário não encontrado." }, { status: 404 });
+    }
+
+    const novaResposta = await prisma.$transaction(async (tx) => {
+        const respostaCriada = await tx.resposta.create({
             data: {
-                formularioId: data.formularioId,
-                pesquisaId: data.pesquisaId,
-                ip: ip,
-                userAgent: userAgent,
+                formularioId: formulario.id,
+                pesquisaId: formulario.pesquisaId,
             },
         });
 
-        // 2. Preparar e criar os detalhes da resposta
-        const detalhesParaCriar = await Promise.all(
-            data.respostasDetalhes.map(async (detail) => {
-                const pergunta = await prisma.pergunta.findUnique({
-                    where: { id: detail.perguntaId },
-                    select: { tipoResposta: true }
-                });
+        const detalhesParaCriar = formulario.perguntas
+            .map(pergunta => {
+                const valor = data.respostas[pergunta.id];
+                if (valor === undefined || valor === null || valor === '') return null;
 
-                if (!pergunta) {
-                    // Se a pergunta não for encontrada, é um erro grave ou dados inválidos
-                    throw new Error(`Pergunta com ID ${detail.perguntaId} não encontrada no banco de dados.`);
-                }
-
-                const detalheData: any = {
-                    respostaId: novaResposta.id,
-                    perguntaId: detail.perguntaId,
+                const detalhe: any = {
+                    respostaId: respostaCriada.id,
+                    perguntaId: pergunta.id,
                 };
 
-                // Mapear o valor para a coluna correta com base no tipoResposta da Pergunta
-                // O `null` é importante para campos opcionais no Prisma
                 switch (pergunta.tipoResposta) {
-                    case TipoResposta.TEXTO:
-                        detalheData.valorTexto = detail.valorTexto || null;
+                    case 'TEXTO':
+                        detalhe.valorTexto = String(valor);
                         break;
-                    case TipoResposta.NUMERO:
-                        detalheData.valorNumero = detail.valorNumero || null;
+                    case 'NUMERO':
+                        detalhe.valorNumero = Number(valor);
                         break;
-                    case TipoResposta.DATA:
-                        detalheData.valorData = detail.valorData ? new Date(detail.valorData) : null;
-                        break;
-                    case TipoResposta.OPCAO:
-                    case TipoResposta.ESCALA:
-                    case TipoResposta.MULTIPLA:
-                        detalheData.valorOpcao = detail.valorOpcao || null;
-                        break;
-                    default:
-                        // Lidar com tipos de resposta desconhecidos ou não esperados
-                        console.warn(`Tipo de resposta desconhecido para pergunta: ${pergunta.tipoResposta}`);
+                    case 'OPCAO':
+                    case 'MULTIPLA':
+                        detalhe.valorOpcao = Array.isArray(valor) ? valor.join(', ') : String(valor);
                         break;
                 }
-                return detalheData;
+                return detalhe;
             })
-        );
-
-        // Criar todos os detalhes de uma vez para melhor performance
-        await prisma.respostaDetalhe.createMany({
-            data: detalhesParaCriar,
-        });
-
-        return NextResponse.json({ message: 'Pesquisa enviada com sucesso!', respostaId: novaResposta.id }, { status: 201 }); // 201 Created
-
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            console.error('Erro de validação Zod ao submeter resposta:', error.errors);
-            return NextResponse.json({ errors: error.errors }, { status: 400 });
+            .filter(Boolean);
+ 
+        if (detalhesParaCriar.length > 0) {
+            await tx.respostaDetalhe.createMany({
+                data: detalhesParaCriar,
+            });
         }
-        console.error('Erro ao salvar resposta:', error);
-        return NextResponse.json({ message: 'Erro ao salvar resposta' }, { status: 500 });
+
+        return respostaCriada;
+    });
+
+    return NextResponse.json({ message: 'Pesquisa enviada com sucesso!', respostaId: novaResposta.id }, { status: 201 });
+
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+        return NextResponse.json({ errors: error.issues }, { status: 400 });
     }
+    console.error('Erro ao salvar resposta:', error);
+    return NextResponse.json({ message: 'Erro ao salvar resposta' }, { status: 500 });
+  }
 }

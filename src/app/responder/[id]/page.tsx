@@ -66,9 +66,6 @@ function RenderizarPergunta({
                       }
                     />
                   );
-                case TipoResposta.DATA:
-                  return <Input type="date" {...field} 
-                />;
 
                 case TipoResposta.OPCAO:
                   if (!opcoes?.opcoes) return null;
@@ -180,8 +177,7 @@ export default function PaginaDeResposta() {
   useEffect(() => {
     const fetchFormulario = async () => {
       try {
-        // A busca do formulário continua a mesma
-        const response = await fetch(`/api/public/formularios/${params.id}`);
+        const response = await fetch(`/api/public/formularios/${formId}`);
         if (!response.ok)
           throw new Error(
             "Este formulário não foi encontrado ou não está mais ativo."
@@ -195,92 +191,41 @@ export default function PaginaDeResposta() {
       }
     };
     fetchFormulario();
-  }, [params.id]);
+  }, [formId]);
 
   const onSubmit = async (data: any) => {
     if (!formulario) return;
 
-    // Adicione o estado de "enviando"
-    // const [isSubmitting, setIsSubmitting] = useState(false);
-    // setIsSubmitting(true);
-
     try {
-      // 1. Transforma os dados do formulário DIRETAMENTE para o formato que a API espera
-      const respostasDetalhes = formulario.perguntas
-        .map((pergunta) => {
-          // Pega o valor da resposta principal e do campo "outro" (se existir)
-          let valor = data.respostas?.[pergunta.id];
-          const textoOutro = data.respostas?.[`${pergunta.id}_outro`];
+      const respostasProcessadas = { ...data.respostas };
+        Object.keys(respostasProcessadas).forEach(key => {
+            if (key.endsWith('_outro') && respostasProcessadas[key]) {
+                const perguntaId = key.split('_')[0];
+                if (respostasProcessadas[perguntaId] === 'outro_texto') {
+                    respostasProcessadas[perguntaId] = respostasProcessadas[key];
+                }
+            }
+        });
 
-          // Lógica para a opção "Outro": Se a opção "outro_texto" foi marcada e
-          // o campo de texto foi preenchido, use o texto como o valor final.
-          if (valor === "outro_texto" && textoOutro) {
-            valor = textoOutro;
-          }
+        const payload = {
+            formularioId: formulario.id,
+            respostas: respostasProcessadas,
+        };
 
-          // Ignora a resposta se ela for vazia, nula ou ainda for "outro_texto" (sem preenchimento)
-          if (
-            valor === undefined ||
-            valor === null ||
-            valor === "" ||
-            valor === "outro_texto"
-          ) {
-            return null;
-          }
+        const response = await fetch("/api/public/respostas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
 
-          const detalhe: any = { perguntaId: pergunta.id };
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Houve um erro ao enviar suas respostas.");
+        }
 
-          // Mapeia o valor para a coluna correta do banco de dados (valorTexto, valorNumero, etc.)
-          switch (pergunta.tipoResposta) {
-            case "TEXTO":
-              detalhe.valorTexto = String(valor);
-              break;
-            case "NUMERO":
-            case "ESCALA":
-              detalhe.valorNumero = Number(valor);
-              break;
-            case "DATA":
-              detalhe.valorData = new Date(valor).toISOString();
-              break;
-            case "OPCAO": // O valor já é o texto da opção, incluindo o "Outro"
-              detalhe.valorOpcao = String(valor);
-              break;
-            case "MULTIPLA":
-              detalhe.valorOpcao = Array.isArray(valor)
-                ? valor.join(", ")
-                : String(valor);
-              break;
-          }
-          return detalhe;
-        })
-        .filter(Boolean); // Remove qualquer resposta que resultou em 'null'
-
-      // 2. Monta o payload final para a API
-      const payload = {
-        pesquisaId: formulario.pesquisaId,
-        formularioId: formulario.id,
-        respostasDetalhes: respostasDetalhes,
-      };
-
-      // 3. Envia para a API correta (/api/respostas)
-      const response = await fetch("/api/respostas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || "Houve um erro ao enviar suas respostas."
-        );
-      }
-
-      // setSuccess(true); // Supondo que você tenha esse estado
+        setSuccess(true);
     } catch (err: any) {
-      // toast.error(err.message); // Supondo que você use toasts
-    } finally {
-      // setIsSubmitting(false);
+      toast.error(err.message); 
     }
   };
 

@@ -37,7 +37,7 @@ export function GerenciadorDePerguntas({ formularioInicial }: GerenciadorProps) 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col justify-between items-center pb-4 border-b">
+      <div className="flex flex-col justify-between items-center pb-4 border-b md:flex-row">
         <div>
           <h1 className="text-3xl font-bold">{formularioInicial.nome}</h1>
           <p className="text-muted-foreground">{formularioInicial.descricao}</p>
