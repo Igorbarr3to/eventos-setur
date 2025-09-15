@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import { LocalidadeSelector } from "@/components/public/localidade-selector";
 
 type FormularioComPerguntas = Formulario & { perguntas: Pergunta[] };
 
@@ -150,6 +151,8 @@ function RenderizarPergunta({
                       ))}
                     </div>
                   );
+                case TipoResposta.LOCALIDADE_MUNICIPIO:
+                  return <LocalidadeSelector field={field} />;
 
                 default:
                   return <Input {...field} />; // fallback seguro
@@ -198,34 +201,36 @@ export default function PaginaDeResposta() {
 
     try {
       const respostasProcessadas = { ...data.respostas };
-        Object.keys(respostasProcessadas).forEach(key => {
-            if (key.endsWith('_outro') && respostasProcessadas[key]) {
-                const perguntaId = key.split('_')[0];
-                if (respostasProcessadas[perguntaId] === 'outro_texto') {
-                    respostasProcessadas[perguntaId] = respostasProcessadas[key];
-                }
-            }
-        });
-
-        const payload = {
-            formularioId: formulario.id,
-            respostas: respostasProcessadas,
-        };
-
-        const response = await fetch("/api/public/respostas", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Houve um erro ao enviar suas respostas.");
+      Object.keys(respostasProcessadas).forEach((key) => {
+        if (key.endsWith("_outro") && respostasProcessadas[key]) {
+          const perguntaId = key.split("_")[0];
+          if (respostasProcessadas[perguntaId] === "outro_texto") {
+            respostasProcessadas[perguntaId] = respostasProcessadas[key];
+          }
         }
+      });
 
-        setSuccess(true);
+      const payload = {
+        formularioId: formulario.id,
+        respostas: respostasProcessadas,
+      };
+
+      const response = await fetch("/api/public/respostas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Houve um erro ao enviar suas respostas."
+        );
+      }
+
+      setSuccess(true);
     } catch (err: any) {
-      toast.error(err.message); 
+      toast.error(err.message);
     }
   };
 
