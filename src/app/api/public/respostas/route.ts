@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const publicSubmissionSchema = z.object({
-  formularioId: z.number().int(),
+  formularioId: z.string(),
   respostas: z.record(z.any()),
 });
 

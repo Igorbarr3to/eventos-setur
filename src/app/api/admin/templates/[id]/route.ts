@@ -23,8 +23,7 @@ export async function GET(
   }
 
   try {
-    const id = (await params).id;
-    const templateId = parseInt(id, 10);
+    const templateId = (await params).id;
     const template = await prisma.formularioTemplate.findUnique({
       where: { id: templateId },
       include: { perguntas: { orderBy: { ordem: 'asc' } } },
@@ -51,8 +50,7 @@ export async function PATCH(
   }
 
   try {
-    const id = (await params).id;
-    const templateId = parseInt(id, 10);
+    const templateId = (await params).id;
     const json = await request.json();
     
     // 2. Validação dos dados
@@ -90,12 +88,8 @@ export async function DELETE(
   }
 
   try {
-    const id = (await params).id;
-    const templateId = parseInt(id, 10);
-
-    // 2. Lógica de exclusão no banco
-    // Graças ao 'onDelete: Cascade' no schema, o Prisma também excluirá
-    // todas as PerguntaTemplate associadas a este FormularioTemplate.
+    const templateId =(await params).id;
+    
     await prisma.formularioTemplate.delete({
       where: { id: templateId },
     });

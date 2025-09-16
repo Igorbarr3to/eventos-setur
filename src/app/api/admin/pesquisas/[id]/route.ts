@@ -41,11 +41,7 @@ export async function GET(
   }
 
   try {
-    const id = (await params).id;
-    const pesquisaId = parseInt(id, 10);
-    if (isNaN(pesquisaId)) {
-      return NextResponse.json({ message: 'ID da pesquisa inválido.' }, { status: 400 });
-    }
+    const pesquisaId =(await params).id;
 
     const pesquisa = await prisma.pesquisa.findUnique({
       where: { id: pesquisaId },
@@ -77,12 +73,8 @@ export async function PATCH(
   }
 
   try {
-    const id = (await params).id;
-    const pesquisaId = parseInt(id, 10);
-    if (isNaN(pesquisaId)) {
-      return NextResponse.json({ message: 'ID da pesquisa inválido.' }, { status: 400 });
-    }
-    
+    const pesquisaId = (await params).id;
+
     // Validação dos dados de entrada
     const json = await request.json();
     const data = editPesquisaSchema.parse(json);
@@ -115,11 +107,7 @@ export async function DELETE(
   }
 
   try {
-    const id = (await params).id;
-    const pesquisaId = parseInt(id, 10);
-    if (isNaN(pesquisaId)) {
-      return NextResponse.json({ message: 'ID da pesquisa inválido.' }, { status: 400 });
-    }
+    const pesquisaId = (await params).id;
     
     await prisma.pesquisa.delete({
       where: { id: pesquisaId },

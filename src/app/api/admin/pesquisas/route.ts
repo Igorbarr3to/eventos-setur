@@ -41,8 +41,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const json = await request.json();
-    const data = createPesquisaSchema.parse(json);
+    const data = await request.json();
 
     const novaPesquisa = await prisma.pesquisa.create({
       data: {

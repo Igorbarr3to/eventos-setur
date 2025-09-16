@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Prisma } from "@prisma/client";
 
 const aplicarTemplateSchema = z.object({
-  templateId: z.number().int(),
+  templateId: z.string()
 });
 
 export async function POST(
@@ -20,10 +20,8 @@ export async function POST(
   }
 
   try {
-    const id = (await params).id;
-    const pesquisaId = parseInt(id);
-    const json = await request.json();
-    const data = aplicarTemplateSchema.parse(json);
+    const pesquisaId = (await params).id;
+    const data = await request.json();
 
     const template = await prisma.formularioTemplate.findUnique({
       where: { id: data.templateId },

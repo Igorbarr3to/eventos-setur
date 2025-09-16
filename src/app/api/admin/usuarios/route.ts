@@ -18,7 +18,7 @@ const createUserSchema = z.object({
 refine((data) => data.password === data.confirmPassword, {
   message: "As senhas não coincidem.",
   path: ["confirmPassword"], 
-});;
+});
 
 export async function POST(request: NextRequest) {
   // Proteger o endpoint: Apenas admins podem criar usuários

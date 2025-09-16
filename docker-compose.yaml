@@ -15,15 +15,15 @@ services:
 
   postgres:
     image: postgres:15
-    container_name: monitur-pesquisas-db-prod
+    container_name: monitur-pesquisas-db-dev
     restart: unless-stopped
     ports:
       - "5432:5432"
     env_file:
       - .env
     volumes:
-      - postgres-prod-data:/var/lib/postgresql/data
+      - postgres-dev-data:/var/lib/postgresql/data
 
 volumes:
-  postgres-prod-data:
-    name: monitur-pesquisas-prod-data
+  postgres-dev-data:
+    name: monitur-pesquisas-dev-data

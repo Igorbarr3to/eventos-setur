@@ -28,15 +28,8 @@ export async function DELETE(
   }
 
   try {
-    const id = (await params).id;
-    const userIdToDelete = parseInt(id, 10);
-    if (isNaN(userIdToDelete)) {
-      return NextResponse.json(
-        { message: "ID de usuário inválido." },
-        { status: 400 }
-      );
-    }
-
+    const userIdToDelete = (await params).id;
+  
     if (session.user.id === userIdToDelete) {
       return NextResponse.json(
         {
@@ -84,15 +77,7 @@ export async function PATCH(
   }
 
   try {
-    const id = (await params).id;
-
-    const userId = parseInt(id, 10);
-    if (isNaN(userId)) {
-      return NextResponse.json(
-        { message: "ID de usuário inválido." },
-        { status: 400 }
-      );
-    }
+    const userId = (await params).id;
 
     const json = await request.json();
     const data = editUserSchema.parse(json);

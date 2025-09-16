@@ -70,7 +70,7 @@ const formSchema = z
 type FormValues = z.infer<typeof formSchema>;
 
 interface CriarPerguntaModalProps {
-  formularioId: number;
+  formularioId: string;
   onPerguntaCriada: () => void;
 }
 

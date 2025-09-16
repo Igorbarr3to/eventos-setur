@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface DeletarPerguntaBotaoProps {
-  perguntaId: number;
+  perguntaId: string;
   onPerguntaDeleted: () => void;
 }
 

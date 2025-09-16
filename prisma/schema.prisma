@@ -8,14 +8,13 @@ generator client {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
+  id            String    @id @default(uuid()) @db.Uuid
   name          String?
   email         String?   @unique
   emailVerified DateTime?
-  password      String? // Para guardar a senha com hash
-  role          UserRole  @default(USER) // Essencial para autorização
+  password      String?
+  role          UserRole  @default(USER)
 
-  // Relação com as pesquisas que o usuário criou
   pesquisasCriadas Pesquisa[] @relation("CreatedBy")
 
   createdAt DateTime @default(now())
@@ -27,15 +26,13 @@ enum UserRole {
   ADMIN
 }
 
-// Modelo para representar uma pesquisa
 model Pesquisa {
-  id             Int          @id @default(autoincrement())
+  id             String       @id @default(uuid()) @db.Uuid
   tipo           PesquisaTipo @default(EVENTO)
   titulo         String       @db.VarChar(255)
   descricao      String?      @db.Text
   localAplicacao String?      @map("local_aplicacao") @db.VarChar(255)
 
-  // Campos específicos para tipo 'evento'
   tituloProjeto        String?   @map("titulo_projeto") @db.VarChar(255)
   objetivoGeral        String?   @map("objetivo_geral") @db.Text
   objetivosEspecificos String?   @map("objetivos_especificos") @db.Text
@@ -55,12 +52,13 @@ model Pesquisa {
   dataFim              DateTime? @map("data_fim") @db.Date
 
   status    PesquisaStatus @default(PLANEJADO)
-  createdBy Int?           @map("created_by")
+  createdBy String?        @db.Uuid @map("created_by")
   creator   User?          @relation("CreatedBy", fields: [createdBy], references: [id])
-  createdAt DateTime       @default(now()) @map("created_at")
-  updatedAt DateTime       @updatedAt @map("updated_at")
 
-  formularios Formulario[] // Uma Pesquisa pode ter vários Formulários
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  formularios Formulario[]
   Resposta    Resposta[]
 
   @@map("pesquisas")
@@ -79,8 +77,8 @@ enum PesquisaStatus {
 }
 
 model Formulario {
-  id         Int            @id @default(autoincrement())
-  pesquisaId Int            @map("pesquisa_id")
+  id         String         @id @default(uuid()) @db.Uuid
+  pesquisaId String         @db.Uuid @map("pesquisa_id")
   pesquisa   Pesquisa       @relation(fields: [pesquisaId], references: [id], onDelete: Cascade)
   nome       String         @db.VarChar(255)
   tipo       FormularioTipo @default(PARTICIPANTE)
@@ -89,8 +87,8 @@ model Formulario {
   createdAt  DateTime       @default(now()) @map("created_at")
   updatedAt  DateTime       @updatedAt @map("updated_at")
 
-  perguntas Pergunta[] // Um Formulário tem várias Perguntas
-  respostas Resposta[] // Um Formulário tem várias Respostas (cabeçalhos)
+  perguntas Pergunta[]
+  respostas Resposta[]
 
   @@map("formularios")
 }
@@ -102,21 +100,21 @@ enum FormularioTipo {
 }
 
 model Pergunta {
-  id           Int          @id @default(autoincrement())
-  formularioId Int          @map("formulario_id")
-  formulario   Formulario   @relation(fields: [formularioId], references: [id], onDelete: Cascade)
-  
-  texto        String       @db.Text
-  tipoResposta TipoResposta @map("tipo_resposta")
-  opcoesJson   Json?        @map("opcoes_json") // JSON para opções de múltipla escolha ou escala
-  obrigatoria  Boolean      @default(false)
-  incluirOpcaoOutro Boolean @default(false) @map("incluir_opcao_outro")
-  ordem        Int? // Ordem da pergunta no formulário
+  id           String     @id @default(uuid()) @db.Uuid
+  formularioId String     @db.Uuid @map("formulario_id")
+  formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
 
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
+  texto             String       @db.Text
+  tipoResposta      TipoResposta @map("tipo_resposta")
+  opcoesJson        Json?        @map("opcoes_json")
+  obrigatoria       Boolean      @default(false)
+  incluirOpcaoOutro Boolean      @default(false) @map("incluir_opcao_outro")
+  ordem             Int?
 
-  respostasDetalhes RespostaDetalhe[] // Uma Pergunta pode ter muitos detalhes de Resposta
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  respostasDetalhes RespostaDetalhe[]
 
   @@map("perguntas")
 }
@@ -124,16 +122,16 @@ model Pergunta {
 enum TipoResposta {
   TEXTO
   NUMERO
-  OPCAO // Para radio buttons (uma única escolha)
-  MULTIPLA // Para checkboxes (múltiplas escolhas)
+  OPCAO
+  MULTIPLA
   LOCALIDADE_MUNICIPIO
 }
 
 model Resposta {
-  id           Int        @id @default(autoincrement())
-  formularioId Int        @map("formulario_id")
+  id           String     @id @default(uuid()) @db.Uuid
+  formularioId String     @db.Uuid @map("formulario_id")
   formulario   Formulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
-  pesquisaId   Int        @map("pesquisa_id")
+  pesquisaId   String     @db.Uuid @map("pesquisa_id")
   pesquisa     Pesquisa   @relation(fields: [pesquisaId], references: [id], onDelete: Cascade)
   dataResposta DateTime   @default(now()) @map("data_resposta")
   ip           String?    @db.Inet()
@@ -141,22 +139,22 @@ model Resposta {
   createdAt    DateTime   @default(now()) @map("created_at")
   updatedAt    DateTime   @updatedAt @map("updated_at")
 
-  detalhes RespostaDetalhe[] // Uma Resposta tem muitos Detalhes de Resposta
+  detalhes RespostaDetalhe[]
 
   @@map("respostas")
 }
 
 model RespostaDetalhe {
-  id         Int      @id @default(autoincrement())
-  respostaId Int      @map("resposta_id")
+  id         String   @id @default(uuid()) @db.Uuid
+  respostaId String   @db.Uuid @map("resposta_id")
   resposta   Resposta @relation(fields: [respostaId], references: [id], onDelete: Cascade)
-  perguntaId Int      @map("pergunta_id")
+  perguntaId String   @db.Uuid @map("pergunta_id")
   pergunta   Pergunta @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
 
   valorTexto  String?   @map("valor_texto") @db.Text
   valorNumero Decimal?  @map("valor_numero") @db.Decimal(10, 2)
   valorData   DateTime? @map("valor_data") @db.Date
-  valorOpcao  String?   @map("valor_opcao") @db.VarChar(255) // Para opção selecionada ou valores de múltipla escolha (se for string concatenada)
+  valorOpcao  String?   @map("valor_opcao") @db.VarChar(255)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -165,12 +163,12 @@ model RespostaDetalhe {
 }
 
 model FormularioTemplate {
-  id        Int      @id @default(autoincrement())
-  nome      String   @db.VarChar(255)
-  descricao String?  @db.Text
+  id        String         @id @default(uuid()) @db.Uuid
+  nome      String         @db.VarChar(255)
+  descricao String?        @db.Text
   tipo      FormularioTipo @default(PARTICIPANTE)
-  
-  perguntas PerguntaTemplate[] // Um template de formulário tem várias perguntas modelo
+
+  perguntas PerguntaTemplate[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -179,19 +177,19 @@ model FormularioTemplate {
 }
 
 model PerguntaTemplate {
-  id             Int      @id @default(autoincrement())
-  templateId     Int      @map("template_id")
-  template       FormularioTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  id         String             @id @default(uuid()) @db.Uuid
+  templateId String             @db.Uuid @map("template_id")
+  template   FormularioTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
 
-  texto          String   @db.Text
-  tipoResposta   TipoResposta @map("tipo_resposta")
-  opcoesJson     Json?    @map("opcoes_json")
-  obrigatoria    Boolean  @default(false)
-  incluirOpcaoOutro Boolean @default(false) @map("incluir_opcao_outro")
-  ordem          Int?
+  texto             String       @db.Text
+  tipoResposta      TipoResposta @map("tipo_resposta")
+  opcoesJson        Json?        @map("opcoes_json")
+  obrigatoria       Boolean      @default(false)
+  incluirOpcaoOutro Boolean      @default(false) @map("incluir_opcao_outro")
+  ordem             Int?
 
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("perguntas_templates")
 }

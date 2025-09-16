@@ -26,10 +26,8 @@ export async function PATCH(
   }
 
   try {
-    const id = (await params).id;
-    const formularioId = parseInt(id, 10);
-    const json = await request.json();
-    const data = editFormularioSchema.parse(json);
+    const formularioId = (await params).id;
+    const data = await request.json();
 
     const updatedFormulario = await prisma.formulario.update({
       where: { id: formularioId },
@@ -56,8 +54,7 @@ export async function DELETE(
   }
 
   try {
-    const id = (await params).id;
-    const formularioId = parseInt(id, 10);
+    const formularioId = (await params).id;
 
     // O onDelete: Cascade no schema cuidará de excluir as perguntas e respostas associadas.
     await prisma.formulario.delete({

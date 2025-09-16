@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface DeletarTemplateBotaoProps {
-  templateId: number;
+  templateId: string;
   onTemplateDeleted: () => void;
 }
 

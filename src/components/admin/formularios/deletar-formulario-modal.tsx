@@ -16,7 +16,7 @@ import {
 import { toast } from "sonner";
 
 interface DeletarFormularioBotaoProps {
-  formularioId: number;
+  formularioId: string;
   onFormularioDeleted: () => void;
 }
 

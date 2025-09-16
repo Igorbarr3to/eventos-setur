@@ -29,7 +29,7 @@ interface DetalheResposta {
   pergunta: PerguntaInfo;
 }
 interface RespostaCompleta {
-  id: number;
+  id: string;
   dataResposta: string;
   detalhes: DetalheResposta[];
 }

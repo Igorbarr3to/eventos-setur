@@ -8,7 +8,7 @@ import { EditarPerguntaModal } from "./editar-pergunta-modal";
 import { DeletarPerguntaBotao } from "./deletar-pergunta-modal";
 
 interface PerguntasListProps {
-  formularioId: number;
+  formularioId: string;
 }
 
 export function PerguntasList({ formularioId }: PerguntasListProps) {

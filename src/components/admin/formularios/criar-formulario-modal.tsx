@@ -24,7 +24,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface CriarFormularioModalProps {
-  pesquisaId: number;
+  pesquisaId: string;
   onFormularioCriado: () => void;
 }
 

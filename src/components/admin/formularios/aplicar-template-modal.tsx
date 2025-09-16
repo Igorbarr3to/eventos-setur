@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 
 interface AplicarTemplateModalProps {
-  pesquisaId: number;
+  pesquisaId: string;
   onFormularioCriado: () => void;
 }
 
@@ -40,7 +40,7 @@ export function AplicarTemplateModal({ pesquisaId, onFormularioCriado }: Aplicar
       const response = await fetch(`/api/admin/pesquisas/${pesquisaId}/aplicar-template`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateId: parseInt(selectedTemplateId) }),
+        body: JSON.stringify({ templateId: selectedTemplateId }),
       });
 
       if (!response.ok) throw new Error("Falha ao aplicar o template.");

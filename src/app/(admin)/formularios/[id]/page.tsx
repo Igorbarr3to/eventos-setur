@@ -19,8 +19,7 @@ async function getFormulario(
   id: string
 ): Promise<FormularioComPerguntas | null> {
   try {
-    const formularioId = parseInt(id, 10);
-    if (isNaN(formularioId)) return null;
+    const formularioId = id;
 
     const formulario = await prisma.formulario.findUnique({
       where: { id: formularioId },

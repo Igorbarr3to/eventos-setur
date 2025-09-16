@@ -7,7 +7,7 @@ import { authOptions } from '@/lib/auth';
 
 // Esquema Zod para validar os dados ao criar um novo Formulário
 const createFormularioSchema = z.object({
-    pesquisaId: z.number().int('ID da pesquisa deve ser um número inteiro.').min(1, 'ID da pesquisa é obrigatório.'),
+    pesquisaId: z.string().min(1, 'ID da pesquisa é obrigatório.'),
     nome: z.string().min(1, 'Nome do formulário é obrigatório.'),
     tipo: z.nativeEnum(FormularioTipo).default(FormularioTipo.PARTICIPANTE),
     descricao: z.string().optional().nullable(),
@@ -23,8 +23,7 @@ export async function POST(request: NextRequest) {
     }
     
     try {
-        const json = await request.json();
-        const data = createFormularioSchema.parse(json);
+        const data = await request.json();
 
         //Verificar se a pesquisaId existe
         const pesquisaExists = await prisma.pesquisa.findUnique({ where: { id: data.pesquisaId } });
@@ -66,7 +65,7 @@ export async function GET(request: NextRequest) {
 
     try {
         const formularios = await prisma.formulario.findMany({
-            where: pesquisaId ? { pesquisaId: parseInt(pesquisaId) } : {},
+            where: pesquisaId ? { pesquisaId } : {},
             orderBy: { createdAt: 'desc' },
             include: {
                 pesquisa: { // Inclui os dados da Pesquisa para contexto

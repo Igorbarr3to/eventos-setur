@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface DeletarUsuarioBotaoProps {
-    userId: number;
+    userId: string;
     onUserDeleted: () => void;
 }
 

@@ -24,7 +24,7 @@ interface DetalheResposta {
 }
 
 interface RespostaCompleta {
-  id: number;
+  id: string;
   dataResposta: string;
   detalhes: DetalheResposta[];
 }

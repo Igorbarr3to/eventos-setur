@@ -6,7 +6,7 @@ import { z } from "zod";
 import { TipoResposta } from "@prisma/client";
 
 const createPerguntaTemplateSchema = z.object({
-  templateId: z.number().int(),
+  templateId: z.string(),
   texto: z.string().min(1, "O texto da pergunta é obrigatório."),
   tipoResposta: z.nativeEnum(TipoResposta),
   incluirOpcaoOutro: z.boolean().optional().default(false),
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
   }
 
   const perguntas = await prisma.perguntaTemplate.findMany({
-    where: { templateId: parseInt(templateId) },
+    where: { templateId },
     orderBy: { ordem: "asc" },
   });
 

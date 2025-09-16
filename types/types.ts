@@ -28,7 +28,7 @@ export enum TipoResposta {
 }
 
 export interface BackendPesquisa {
-  id: number;
+  id: string;
   titulo: string;
   descricao?: string;
   localAplicacao?: string;
@@ -57,7 +57,7 @@ export interface BackendPesquisa {
 }
 
 export interface BackendFormulario {
-  id: number;
+  id: string;
   nome: string;
   tipo: FormularioTipo;
   descricao?: string;
@@ -65,7 +65,7 @@ export interface BackendFormulario {
 }
 
 export interface BackendPergunta {
-  id: number;
+  id: string;
   texto: string;
   tipoResposta: TipoResposta;
   opcoesJson?: { value: string; label: string }[] | string[]; // Exemplo de estrutura para opções
@@ -79,13 +79,13 @@ export type DynamicFormData = Record<number, string | number | string[] | null |
 
 // Tipagem para os dados que serão ENVIADOS ao backend para Resposta e RespostaDetalhe
 export interface FrontendSubmissionData {
-  formularioId: number; // ID do formulário preenchido
-  pesquisaId: number;   // ID da pesquisa (evento) a que o formulário pertence
+  formularioId: string; // ID do formulário preenchido
+  pesquisaId: string;   // ID da pesquisa (evento) a que o formulário pertence
   ip?: string; // Opcional, pode ser coletado no backend
   userAgent?: string; // Opcional, pode ser coletado no backend
   // Detalhes das respostas, mapeados para RespostaDetalhe
   respostasDetalhes: {
-    perguntaId: number;
+    perguntaId: string;
     valorTexto?: string;
     valorNumero?: number;
     valorData?: string; // Ou Date, dependendo do parse

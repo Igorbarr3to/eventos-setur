@@ -20,7 +20,7 @@ import { AplicarTemplateModal } from "./aplicar-template-modal";
 import Link from "next/link";
 
 interface FormulariosListProps {
-  pesquisaId: number;
+  pesquisaId: string;
 }
 
 export function FormulariosList({ pesquisaId }: FormulariosListProps) {

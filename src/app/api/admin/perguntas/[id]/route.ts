@@ -25,8 +25,7 @@ export async function PATCH(
   }
 
   try {
-    const id = (await params).id;
-    const perguntaId = parseInt(id);
+    const perguntaId = (await params).id;
     const json = await request.json();
     const data = editPerguntaSchema.parse(json);
 
@@ -60,8 +59,7 @@ export async function DELETE(
   }
 
   try {
-    const id = (await params).id;
-    const perguntaId = parseInt(id);
+    const perguntaId = (await params).id;
     await prisma.pergunta.delete({ where: { id: perguntaId } });
     return NextResponse.json({ message: "Pergunta excluída com sucesso." });
   } catch (error) {

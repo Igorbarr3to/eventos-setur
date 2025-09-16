@@ -7,11 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = (await params).id;
-    const formularioId = parseInt(id, 10);
-    if (isNaN(formularioId)) {
-      return NextResponse.json({ message: 'ID de formulário inválido.' }, { status: 400 });
-    }
+    const formularioId = (await params).id;
 
     const formulario = await prisma.formulario.findUnique({
       where: { 
