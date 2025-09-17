@@ -18,6 +18,7 @@ import { EditarFormularioModal } from "./editar-formulario-modal";
 import { toast } from "sonner";
 import { AplicarTemplateModal } from "./aplicar-template-modal";
 import Link from "next/link";
+import { QRCodeModal } from "./qr-code-modal";
 
 interface FormulariosListProps {
   pesquisaId: string;
@@ -105,21 +106,10 @@ export function FormulariosList({ pesquisaId }: FormulariosListProps) {
                   </Button>
 
                   <div className="flex justify-between items-center w-full">
-                    <Button
-                      variant={"outline"}
-                      className="transition transform hover:cursor-pointer hover:scale-110"
-                      size="sm"
-                      onClick={() => {
-                        const url = `${window.location.origin}/responder/${form.id}`;
-                        navigator.clipboard.writeText(url);
-                        toast.success(
-                          "Link público copiado para a área de transferência!"
-                        );
-                      }}
-                    >
-                      <Share2 />
-                      Compartilhar
-                    </Button>
+                    <QRCodeModal
+                      formId={form.id}
+                      formName={form.nome}
+                    />
                     <div className="flex gap-2">
                       <EditarFormularioModal
                         formulario={form}

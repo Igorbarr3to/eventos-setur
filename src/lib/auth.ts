@@ -1,4 +1,3 @@
-// /app/api/auth/[...nextauth]/route.ts
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
@@ -60,7 +59,8 @@ export const authOptions: AuthOptions = {
   },
 
   pages: {
-    signIn: "/",
+    signIn: "/dashboard",
+    signOut:"/"
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
