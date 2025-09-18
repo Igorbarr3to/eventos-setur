@@ -3,27 +3,20 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: prod
-    container_name: monitur-pesquisas-prod
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
+    container_name: monitur-pesquisas
     env_file:
       - .env
     depends_on:
       - postgres
 
   postgres:
-    image: postgres:15
-    container_name: monitur-pesquisas-db-dev
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
+    image: postgres:15-alpine
+    container_name: monitur-pesquisas-db
+    restart: always
     env_file:
       - .env
     volumes:
-      - postgres-dev-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
 
 volumes:
-  postgres-dev-data:
-    name: monitur-pesquisas-dev-data
+  postgres-data:

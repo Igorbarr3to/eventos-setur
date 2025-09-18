@@ -1,9 +1,9 @@
-# --- Estágio 1: Base ---
+# --- 1: Base ---
 FROM node:20-alpine AS base
 RUN npm install -g pnpm
 WORKDIR /app
 
-# --- Estágio 2: Build ---
+# --- 2: Build ---
 FROM base AS build 
 COPY package.json pnpm-lock.yaml ./
 # Instala todas as dependências 
@@ -20,3 +20,12 @@ COPY --from=build /app .
 EXPOSE 3000
 
 CMD ["pnpm", "start"]
+
+
+# --- Desenvolvimento ---
+FROM base AS dev
+WORKDIR /app
+COPY . .
+RUN pnpm install
+EXPOSE 3000
+CMD ["pnpm", "dev"]

@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      target: dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "pnpm exec prisma generate && pnpm dev"
