@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import { Formulario, Pergunta } from "@prisma/client";
@@ -13,14 +13,18 @@ interface GerenciadorProps {
   formularioInicial: FormularioComPerguntas;
 }
 
-export function GerenciadorDePerguntas({ formularioInicial }: GerenciadorProps) {
+export function GerenciadorDePerguntas({
+  formularioInicial,
+}: GerenciadorProps) {
   const [perguntas, setPerguntas] = useState(formularioInicial.perguntas || []);
   const [isLoading, setIsLoading] = useState(false);
 
   const refetchPerguntas = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/perguntas?formularioId=${formularioInicial.id}`);
+      const response = await fetch(
+        `/api/admin/perguntas?formularioId=${formularioInicial.id}`
+      );
       if (!response.ok) throw new Error("Falha ao buscar perguntas.");
       const data = await response.json();
       setPerguntas(data);
@@ -48,32 +52,55 @@ export function GerenciadorDePerguntas({ formularioInicial }: GerenciadorProps) 
         />
       </div>
 
-      {isLoading && <p className="text-sm text-muted-foreground">Carregando perguntas...</p>}
-      
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Carregando perguntas...</p>
+      )}
+
       {!isLoading && perguntas.length === 0 && (
-         <div className="text-center py-16 border-2 border-dashed rounded-lg">
-            <ListChecks className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-xl font-semibold">Nenhuma pergunta cadastrada</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Clique em "Adicionar Pergunta" para começar.</p>
+        <div className="text-center py-16 border-2 border-dashed rounded-lg">
+          <ListChecks className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-4 text-xl font-semibold">
+            Nenhuma pergunta cadastrada
+          </h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Clique em "Adicionar Pergunta" para começar.
+          </p>
         </div>
       )}
-      
+
       {!isLoading && perguntas.length > 0 && (
         <div className="border rounded-lg bg-white">
           <ul className="divide-y">
             {perguntas.map((pergunta) => (
-              <li key={pergunta.id} className="flex justify-between items-center p-4 hover:bg-slate-50">
+              <li
+                key={pergunta.id}
+                className="flex justify-between items-center p-4 hover:bg-slate-50"
+              >
                 <div className="flex-1">
-                  <span className="font-medium">{pergunta.ordem}. {pergunta.texto}</span>
-                  <span className="block text-xs text-muted-foreground font-mono ml-5">{pergunta.tipoResposta} {pergunta.obrigatoria ? '(Obrigatória)' : ''}</span>
+                  <span className="font-medium">
+                    {pergunta.ordem}. {pergunta.texto}
+                  </span>
+                  <span className="block text-xs text-muted-foreground font-mono ml-5">
+                    {" "}
+                    {pergunta.tipoResposta === "TEXTO"
+                      ? "Texto"
+                      : pergunta.tipoResposta === "NUMERO"
+                      ? "Número"
+                      : pergunta.tipoResposta === "OPCAO"
+                      ? "Opção"
+                      : pergunta.tipoResposta === "MULTIPLA"
+                      ? "Multipla"
+                      : "Municipio"}{" "}
+                    {pergunta.obrigatoria ? "(Obrigatória)" : ""}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <EditarPerguntaModal
-                    pergunta={pergunta} 
-                    onPerguntaEditada={refetchPerguntas} 
+                    pergunta={pergunta}
+                    onPerguntaEditada={refetchPerguntas}
                   />
                   <DeletarPerguntaBotao
-                    perguntaId={pergunta.id} 
+                    perguntaId={pergunta.id}
                     onPerguntaDeleted={refetchPerguntas}
                   />
                 </div>

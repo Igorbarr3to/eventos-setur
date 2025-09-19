@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import { Pergunta } from "@prisma/client";
@@ -18,7 +18,9 @@ export function PerguntasList({ formularioId }: PerguntasListProps) {
   const refetchPerguntas = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/perguntas?formularioId=${formularioId}`);
+      const response = await fetch(
+        `/api/admin/perguntas?formularioId=${formularioId}`
+      );
       if (!response.ok) throw new Error("Falha ao buscar perguntas.");
       const data = await response.json();
       setPerguntas(data);
@@ -45,29 +47,46 @@ export function PerguntasList({ formularioId }: PerguntasListProps) {
         />
       </div>
 
-      {isLoading && <p className="text-sm text-muted-foreground">Carregando...</p>}
-      
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Carregando...</p>
+      )}
+
       {!isLoading && perguntas.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
           <ListChecks className="mx-auto h-8 w-8" />
           <p className="mt-2 text-sm">Nenhuma pergunta cadastrada.</p>
         </div>
       )}
-      
+
       {!isLoading && perguntas.length > 0 && (
         <ul className="space-y-2">
           {perguntas.map((pergunta) => (
-            <li key={pergunta.id} className="flex justify-between items-center bg-white p-3 rounded-md border text-sm">
-              <span>{pergunta.ordem}. {pergunta.texto}</span>
-              <span className="font-mono text-xs p-1 bg-gray-100 rounded">{pergunta.tipoResposta}</span>
-              <EditarPerguntaModal 
-                    pergunta={pergunta} 
-                    onPerguntaEditada={refetchPerguntas} 
-                />
-                <DeletarPerguntaBotao
-                    perguntaId={pergunta.id} 
-                    onPerguntaDeleted={refetchPerguntas}
-                />
+            <li
+              key={pergunta.id}
+              className="flex justify-between items-center bg-white p-3 rounded-md border text-sm"
+            >
+              <span>
+                {pergunta.ordem}. {pergunta.texto}
+              </span>
+              <span className="font-mono text-xs p-1 bg-gray-100 rounded">
+                {pergunta.tipoResposta === "TEXTO"
+                  ? "Texto"
+                  : pergunta.tipoResposta === "NUMERO"
+                  ? "Número"
+                  : pergunta.tipoResposta === "OPCAO"
+                  ? "Opção"
+                  : pergunta.tipoResposta === "MULTIPLA"
+                  ? "Multipla"
+                  : "Municipio"}
+              </span>
+              <EditarPerguntaModal
+                pergunta={pergunta}
+                onPerguntaEditada={refetchPerguntas}
+              />
+              <DeletarPerguntaBotao
+                perguntaId={pergunta.id}
+                onPerguntaDeleted={refetchPerguntas}
+              />
             </li>
           ))}
         </ul>

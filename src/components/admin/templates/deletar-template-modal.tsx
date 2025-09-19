@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
@@ -21,14 +21,17 @@ interface DeletarTemplateBotaoProps {
   onTemplateDeleted: () => void;
 }
 
-export function DeletarTemplateBotao({ templateId, onTemplateDeleted }: DeletarTemplateBotaoProps) {
+export function DeletarTemplateBotao({
+  templateId,
+  onTemplateDeleted,
+}: DeletarTemplateBotaoProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/admin/templates/${templateId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
@@ -38,7 +41,6 @@ export function DeletarTemplateBotao({ templateId, onTemplateDeleted }: DeletarT
 
       toast.success("Template excluído com sucesso!");
       onTemplateDeleted();
-
     } catch (error: any) {
       toast.error(error.message);
       console.error(error);
@@ -49,19 +51,24 @@ export function DeletarTemplateBotao({ templateId, onTemplateDeleted }: DeletarT
 
   return (
     <AlertDialog>
-       <AlertDialogTrigger className="text-red-600 transform transition-all hover:scale-125">
+      <AlertDialogTrigger className="text-red-600 transform transition-all hover:scale-125">
         <Trash2 />
       </AlertDialogTrigger>
       <AlertDialogContent className="bg-white">
         <AlertDialogHeader>
           <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
           <AlertDialogDescription>
-            Esta ação não pode ser desfeita. Isso excluirá permanentemente o template e todas as suas perguntas modelo associadas.
+            Esta ação não pode ser desfeita. Isso excluirá permanentemente o
+            template e todas as suas perguntas modelo associadas.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-red-600 hover:bg-red-700">
+          <AlertDialogAction
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="bg-red-600 hover:bg-red-700"
+          >
             {isDeleting ? "Excluindo..." : "Sim, excluir template"}
           </AlertDialogAction>
         </AlertDialogFooter>

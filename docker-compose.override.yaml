@@ -8,3 +8,7 @@ services:
       - .:/app
       - /app/node_modules
     command: sh -c "pnpm exec prisma generate && pnpm dev"
+
+  postgres:
+    ports:
+      - "5432:5432"

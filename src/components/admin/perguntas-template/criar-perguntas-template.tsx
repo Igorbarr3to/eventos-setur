@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pergunta, TipoResposta } from "@prisma/client";
 import { toast } from "sonner";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -171,61 +171,73 @@ export function CriarPerguntaTemplateModal({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="tipoResposta"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo de Resposta</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-white">
-                      {Object.values(TipoResposta).map((tipo) => (
-                        <SelectItem key={tipo} value={tipo}>
-                          {tipo}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            {tipoSelecionado === "OPCAO" && (
+            <div className="flex flex-col gap-3 md:flex-row justify-between">
               <FormField
                 control={form.control}
-                name="incluirOpcaoOutro"
+                name="tipoResposta"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        Incluir opção "Outro" com campo de texto?
-                      </FormLabel>
-                    </div>
+                  <FormItem>
+                    <FormLabel>Tipo de Resposta</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white ">
+                        {Object.values(TipoResposta).map((tipo) => (
+                          <SelectItem key={tipo} value={tipo}>
+                            {tipo === "TEXTO"
+                              ? "Texto"
+                              : tipo === "NUMERO"
+                              ? "Número"
+                              : tipo === "OPCAO"
+                              ? "Opção"
+                              : tipo === "MULTIPLA"
+                              ? "Multipla"
+                              : "Municipio"}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
+
+              {tipoSelecionado === "OPCAO" && (
+                <FormField
+                  control={form.control}
+                  name="incluirOpcaoOutro"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center gap-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+
+                        <FormLabel>
+                          Incluir opção "Outro" com campo de texto?
+                        </FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
 
             {/* --- CAMPOS DINÂMICOS COM BASE NO TIPO --- */}
 
             {(tipoSelecionado === "OPCAO" ||
               tipoSelecionado === "MULTIPLA") && (
-              <div className="space-y-3 p-4 border rounded-md">
+              <div className="space-y-3">
                 <FormLabel>Opções de Resposta</FormLabel>
                 {fields.map((item, index) => (
                   <FormField
@@ -243,12 +255,10 @@ export function CriarPerguntaTemplateModal({
                           </FormControl>
                           <Button
                             type="button"
-                            variant="destructive"
-                            size="icon"
                             onClick={() => remove(index)}
                             disabled={fields.length <= 1}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <X className="h-4 w-4 text-red-700" />
                           </Button>
                         </div>
                         <FormMessage />
@@ -271,20 +281,21 @@ export function CriarPerguntaTemplateModal({
               control={form.control}
               name="obrigatoria"
               render={({ field }) => (
-                // O FormItem agora usa flexbox para alinhar o checkbox e o label
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Resposta Obrigatória</FormLabel>
-                    <FormDescription>
-                      Marque se o usuário deve obrigatoriamente responder esta
-                      pergunta.
-                    </FormDescription>
+                <FormItem className="rounded-lg border p-4">
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Resposta Obrigatória</FormLabel>
+                      <FormDescription>
+                        Marque se o usuário deve obrigatoriamente responder esta
+                        pergunta.
+                      </FormDescription>
+                    </div>
                   </div>
                 </FormItem>
               )}

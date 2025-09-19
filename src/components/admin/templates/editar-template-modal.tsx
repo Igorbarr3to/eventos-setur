@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,10 +9,29 @@ import { toast } from "sonner";
 import { Edit } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
@@ -28,7 +47,10 @@ interface EditarTemplateModalProps {
   onTemplateEditado: () => void;
 }
 
-export function EditarTemplateModal({ template, onTemplateEditado }: EditarTemplateModalProps) {
+export function EditarTemplateModal({
+  template,
+  onTemplateEditado,
+}: EditarTemplateModalProps) {
   const [open, setOpen] = useState(false);
 
   const form = useForm<FormValues>({
@@ -53,8 +75,8 @@ export function EditarTemplateModal({ template, onTemplateEditado }: EditarTempl
   const onSubmit = async (data: FormValues) => {
     try {
       const response = await fetch(`/api/admin/templates/${template.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
@@ -66,7 +88,6 @@ export function EditarTemplateModal({ template, onTemplateEditado }: EditarTempl
       toast.success("Template atualizado com sucesso!");
       setOpen(false);
       onTemplateEditado();
-
     } catch (error: any) {
       toast.error(error.message);
       console.error(error);
@@ -75,7 +96,7 @@ export function EditarTemplateModal({ template, onTemplateEditado }: EditarTempl
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-       <DialogTrigger className="transform transition hover:scale-125">
+      <DialogTrigger className="transform transition hover:scale-125">
         <Edit />
       </DialogTrigger>
       <DialogContent className="bg-white">
@@ -84,11 +105,71 @@ export function EditarTemplateModal({ template, onTemplateEditado }: EditarTempl
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField control={form.control} name="nome" render={({ field }) => (<FormItem><FormLabel>Nome do Template</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-            <FormField control={form.control} name="tipo" render={({ field }) => (<FormItem><FormLabel>Tipo de Formulário</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl><SelectContent><SelectItem value={FormularioTipo.PARTICIPANTE}>Participante</SelectItem><SelectItem value={FormularioTipo.EXPOSITOR}>Expositor</SelectItem><SelectItem value={FormularioTipo.ORGANIZADOR}>Organizador</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-            <FormField control={form.control} name="descricao" render={({ field }) => (<FormItem><FormLabel>Descrição</FormLabel><FormControl><Textarea {...field} value={field.value ?? ""} /></FormControl><FormMessage /></FormItem>)} />
-            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
-              {form.formState.isSubmitting ? "Salvando..." : "Salvar Alterações"}
+            <FormField
+              control={form.control}
+              name="nome"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome do Template</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="tipo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de Formulário</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={FormularioTipo.PARTICIPANTE}>
+                        Participante
+                      </SelectItem>
+                      <SelectItem value={FormularioTipo.EXPOSITOR}>
+                        Expositor
+                      </SelectItem>
+                      <SelectItem value={FormularioTipo.ORGANIZADOR}>
+                        Organizador
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="descricao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} value={field.value ?? ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting}
+              className="w-full"
+            >
+              {form.formState.isSubmitting
+                ? "Salvando..."
+                : "Salvar Alterações"}
             </Button>
           </form>
         </Form>
