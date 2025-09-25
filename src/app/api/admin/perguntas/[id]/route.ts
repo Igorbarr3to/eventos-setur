@@ -12,6 +12,8 @@ const editPerguntaSchema = z.object({
   obrigatoria: z.boolean().optional(),
   incluirOpcaoOutro: z.boolean().optional().default(false),
   opcoesJson: z.any().optional().nullable(),
+  opcoesLinhas: z.array(z.object({ texto: z.string()})).optional(),
+  opcoesColunas: z.array(z.object({ texto: z.string()})).optional(),
   ordem: z.number().int().optional(),
 });
 

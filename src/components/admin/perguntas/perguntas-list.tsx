@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Pergunta } from "@prisma/client";
 import { ListChecks } from "lucide-react";
-import { CriarPerguntaModal } from "./criar-perguntas-moda";
+import { CriarPerguntaModal } from "./criar-perguntas-modal";
 import { EditarPerguntaModal } from "./editar-pergunta-modal";
 import { DeletarPerguntaBotao } from "./deletar-pergunta-modal";
 

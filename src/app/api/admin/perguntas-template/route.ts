@@ -11,6 +11,8 @@ const createPerguntaTemplateSchema = z.object({
   tipoResposta: z.nativeEnum(TipoResposta),
   incluirOpcaoOutro: z.boolean().optional().default(false),
   obrigatoria: z.boolean().default(false),
+  opcoesLinhas: z.array(z.object({ texto: z.string() })).optional(),
+  opcoesColunas: z.array(z.object({ texto: z.string() })).optional(),
   opcoesJson: z.any().optional().nullable(),
   ordem: z.number().int().optional(),
 });

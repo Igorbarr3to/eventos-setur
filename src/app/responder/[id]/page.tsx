@@ -20,6 +20,14 @@ import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { LocalidadeSelector } from "@/components/public/localidade-selector";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type FormularioComPerguntas = Formulario & { perguntas: Pergunta[] };
 
@@ -32,7 +40,11 @@ function RenderizarPergunta({
   control: any;
   watch: any;
 }) {
-  const opcoes = pergunta.opcoesJson as { opcoes?: string[] };
+  const opcoes = pergunta.opcoesJson as {
+    opcoes?: string[];
+    linhas: string[];
+    colunas: string[];
+  };
   const valorSelecionado = watch(`respostas.${pergunta.id}`);
 
   return (
@@ -48,7 +60,7 @@ function RenderizarPergunta({
             {pergunta.texto}
           </FormLabel>
 
-          <FormControl className="">
+          <FormControl>
             {(() => {
               switch (pergunta.tipoResposta) {
                 case TipoResposta.TEXTO:
@@ -153,6 +165,61 @@ function RenderizarPergunta({
                   );
                 case TipoResposta.LOCALIDADE_MUNICIPIO:
                   return <LocalidadeSelector field={field} />;
+                case TipoResposta.GRADE_MULTIPLA_ESCOLHA:
+                  if (!opcoes?.linhas || !opcoes?.colunas) return null;
+                  return (
+                    <div className="overflow-x-auto rounded-lg border">
+                      <Table className="min-w-full relative">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="sticky left-0 z-10 w-[200px] bg-white font-medium">
+                              Segmento
+                            </TableHead>
+                            {opcoes.colunas.map((coluna) => (
+                              <TableHead key={coluna} className="text-center">
+                                {coluna}
+                              </TableHead>
+                            ))}
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {opcoes.linhas.map((linha) => (
+                            <FormField
+                              key={linha}
+                              control={control}
+                              name={`respostas.${pergunta.id}.${linha.replace(
+                                /\s+/g,
+                                "_"
+                              )}`}
+                              render={({ field: linhaField }) => (
+                                <TableRow>
+                                  <TableHead className="sticky left-0 z-10 bg-white font-medium">
+                                    {linha}
+                                  </TableHead>
+                                  {opcoes.colunas.map((coluna) => (
+                                    <TableCell
+                                      key={coluna}
+                                      className="text-center "
+                                    >
+                                      <FormControl>
+                                        <RadioGroup
+                                          onValueChange={linhaField.onChange}
+                                          value={linhaField.value}
+                                          className="flex justify-center"
+                                        >
+                                          <RadioGroupItem value={coluna} />
+                                        </RadioGroup>
+                                      </FormControl>
+                                    </TableCell>
+                                  ))}
+                                </TableRow>
+                              )}
+                            />
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  );
 
                 default:
                   return <Input {...field} />; // fallback seguro

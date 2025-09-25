@@ -78,7 +78,7 @@ export function GerenciadorDePerguntasTemplate({
                     {pergunta.ordem}. {pergunta.texto}
                   </span>
                   <span className="block text-xs text-muted-foreground font-mono ml-5">
-                    {pergunta.tipoResposta === "TEXTO"
+                     {pergunta.tipoResposta === "TEXTO"
                       ? "Texto"
                       : pergunta.tipoResposta === "NUMERO"
                       ? "Número"
@@ -86,7 +86,9 @@ export function GerenciadorDePerguntasTemplate({
                       ? "Opção"
                       : pergunta.tipoResposta === "MULTIPLA"
                       ? "Multipla"
-                      : "Municipio"}
+                      : pergunta.tipoResposta === "LOCALIDADE_MUNICIPIO"
+                      ? "Municipio"
+                      : "Grade de Multipla escolha"}{" "}
                     {pergunta.obrigatoria ? "(Obrigatória)" : ""}
                   </span>
                 </div>

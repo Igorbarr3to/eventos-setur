@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Bar,
   BarChart,
@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Decimal } from "@prisma/client/runtime/library";
 
 // Tipos de dados esperados da API
 interface PerguntaInfo {
@@ -24,15 +25,16 @@ interface PerguntaInfo {
 }
 interface DetalheResposta {
   valorTexto: string | null;
-  valorNumero: number | null;
+  valorNumero: Decimal | null;
   valorOpcao: string | null;
   pergunta: PerguntaInfo;
 }
 interface RespostaCompleta {
   id: string;
-  dataResposta: string;
+  dataResposta: Date;
   detalhes: DetalheResposta[];
 }
+
 interface VisualizacaoDeRespostasProps {
   respostasIniciais: RespostaCompleta[];
 }
@@ -48,17 +50,49 @@ const COLORS = [
   "#AF19FF",
 ];
 
+// Função para renderizar o label customizado da Pizza
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+}: any) => {
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  if (percent * 100 < 5) return null;
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor="middle"
+      dominantBaseline="central"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
 export default function VisualizacaoDeRespostas({
   respostasIniciais,
 }: VisualizacaoDeRespostasProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const dadosAgregados = useMemo(() => {
-    if (!respostasIniciais || respostasIniciais.length === 0) {
-      return [];
-    }
+    if (!respostasIniciais || respostasIniciais.length === 0) return [];
 
     const agregador: { [perguntaTexto: string]: any } = {};
 
-    // Agrupa todas as respostas por pergunta
     respostasIniciais.forEach((resposta) => {
       resposta.detalhes.forEach((detalhe) => {
         const { pergunta, valorTexto, valorNumero, valorOpcao } = detalhe;
@@ -75,25 +109,58 @@ export default function VisualizacaoDeRespostas({
       });
     });
 
-    // Processa os dados agregados para o formato de visualização correto
     return Object.entries(agregador).map(([perguntaTexto, dados]) => {
-      if (dados.tipo === "OPCAO" || dados.tipo === "MULTIPLA") {
+      if (dados.tipo === "GRADE_MULTIPLA_ESCOLHA") {
+        const contagem: { [linha: string]: { [coluna: string]: number } } = {};
+        let todasColunas = new Set<string>();
+
+        dados.respostas.forEach((respostaJson: string) => {
+          try {
+            const respostaObjeto = JSON.parse(respostaJson);
+            Object.entries(respostaObjeto).forEach(
+              ([linha, coluna]: [string, any]) => {
+                if (!contagem[linha]) contagem[linha] = {};
+                contagem[linha][coluna] = (contagem[linha][coluna] || 0) + 1;
+                todasColunas.add(coluna);
+              }
+            );
+          } catch (e) {
+            console.error(
+              "Erro ao parsear JSON da resposta da grade:",
+              respostaJson
+            );
+          }
+        });
+
+        // Transforma os dados para o formato que a Recharts espera para barras agrupadas:
+        // [{ name: "Alimentação", "Menos de R$100": 10, "Mais de R$100": 5 }, ...]
+        const dataForChart = Object.entries(contagem).map(
+          ([linha, colunas]) => ({
+            name: linha, // O 'name' será o segmento (Alimentação, etc.)
+            ...colunas,
+          })
+        );
+
+        return {
+          pergunta: perguntaTexto,
+          tipo: "grafico_barras_agrupadas",
+          data: dataForChart,
+          colunas: Array.from(todasColunas), // Passa os nomes das colunas para renderizar as barras
+        };
+      } else if (dados.tipo === "OPCAO" || dados.tipo === "MULTIPLA") {
         const contagem = dados.respostas.reduce(
           (acc: { [key: string]: number }, val: string) => {
-            const opcoes = val.split(", ");
-            opcoes.forEach((opt) => {
+            val.split(", ").forEach((opt) => {
               acc[opt] = (acc[opt] || 0) + 1;
             });
             return acc;
           },
           {}
         );
-
         const dataForChart = Object.entries(contagem).map(([name, value]) => ({
           name,
           value,
         }));
-
         const isBinaryChoice =
           dataForChart.length <= 3 &&
           dataForChart.some((d) =>
@@ -103,7 +170,6 @@ export default function VisualizacaoDeRespostas({
           dataForChart.length >= 4 || !isBinaryChoice
             ? "grafico_pizza"
             : "grafico_barra";
-
         return {
           pergunta: perguntaTexto,
           tipo: tipoGrafico,
@@ -122,7 +188,7 @@ export default function VisualizacaoDeRespostas({
           data: { titulo: "Média", valor: media.toFixed(2) },
         };
       } else {
-        // TEXTO
+        // TEXTO ou LOCALIDADE_MUNICIPIO
         return {
           pergunta: perguntaTexto,
           tipo: "texto",
@@ -136,32 +202,33 @@ export default function VisualizacaoDeRespostas({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Resultados da Pesquisa</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Resultados da Pesquisa</h1>
+      </div>
 
-      <Card className="border-none">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-4">
-            Total de Respostas Recebidas
-            <p className="text-4xl font-bold">{totalRespostas}</p>
-          </CardTitle>
+          <CardTitle>Total de Respostas Recebidas</CardTitle>
         </CardHeader>
+        <CardContent>
+          <p className="text-4xl font-bold">{totalRespostas}</p>
+        </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {dadosAgregados.map((item, index) => (
-          <Card key={index} className="flex flex-col border-none shadow-xl">
+          <Card key={index} className="flex flex-col border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-base font-semibold">
+              <CardTitle className="text-lg font-semibold">
                 {item.pergunta}
               </CardTitle>
             </CardHeader>
             <CardContent className="flex-grow flex items-center justify-center">
-              {/* RENDERIZAÇÃO DO GRÁFICO DE BARRAS */}
-              {item.tipo === "grafico_barra" && (
-                <ResponsiveContainer width="100%" height={300}>
+              {item.tipo === "grafico_barras_agrupadas" && isMounted && (
+                <ResponsiveContainer width="100%" height={400}>
                   <BarChart
                     data={item.data}
-                    margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
+                    margin={{ top: 5, right: 30, left: 0, bottom: 20 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" fontSize={12} />
@@ -173,13 +240,50 @@ export default function VisualizacaoDeRespostas({
                         borderRadius: "0.5rem",
                       }}
                     />
-                    <Bar dataKey="value" name="Contagem" barSize={30}>
+                    <Legend />
+                    {/* Cria uma <Bar> para cada coluna (faixa de gasto) */}
+                    {item.colunas &&
+                      item.colunas.map((coluna: string, idx: number) => (
+                        <Bar
+                          key={coluna}
+                          dataKey={coluna}
+                          fill={COLORS[idx % COLORS.length]}
+                        />
+                      ))}
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+
+              {item.tipo === "grafico_barra" && isMounted && (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={item.data}
+                    margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="name"
+                      fontSize={12}
+                      interval={0}
+                      angle={-45}
+                      textAnchor="end"
+                      height={70}
+                    />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "white",
+                        border: "1px solid #ccc",
+                        borderRadius: "0.5rem",
+                      }}
+                    />
+                    <Bar dataKey="value" name="Contagem">
                       {item.data.map((entry: any, idx: number) => {
                         const nameLower = entry.name.toLowerCase();
-                        let color = "#3b82f6"; // Azul padrão (blue-500)
-                        if (nameLower === "não" || nameLower === "nao") {
-                          color = "#ef4444"; // Vermelho (red-500)
-                        }
+                        let color = "#3b82f6"; // Azul
+                        if (nameLower === "sim") color = "#22c55e"; // Verde
+                        if (nameLower === "não" || nameLower === "nao")
+                          color = "#ef4444"; // Vermelho
                         return <Cell key={`cell-${idx}`} fill={color} />;
                       })}
                     </Bar>
@@ -187,8 +291,7 @@ export default function VisualizacaoDeRespostas({
                 </ResponsiveContainer>
               )}
 
-              {/* RENDERIZAÇÃO DO GRÁFICO DE PIZZA */}
-              {item.tipo === "grafico_pizza" && (
+              {item.tipo === "grafico_pizza" && isMounted && (
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
@@ -197,11 +300,11 @@ export default function VisualizacaoDeRespostas({
                       nameKey="name"
                       cx="50%"
                       cy="50%"
-                      outerRadius={80}
-                      label
+                      outerRadius={100}
                       labelLine={false}
+                      label={renderCustomizedLabel}
                     >
-                      {item.data.map((entry: number, idx: number) => (
+                      {item.data.map((entry: any, idx: number) => (
                         <Cell
                           key={`cell-${idx}`}
                           fill={COLORS[idx % COLORS.length]}
@@ -215,26 +318,23 @@ export default function VisualizacaoDeRespostas({
                         borderRadius: "0.5rem",
                       }}
                     />
-
-                    <Legend align="left" />
+                    <Legend />
                   </PieChart>
                 </ResponsiveContainer>
               )}
 
-              {/* RENDERIZAÇÃO DE ESTATÍSTICA */}
               {item.tipo === "estatistica" && (
-                <p className="text-3xl font-bold">
-                  {item.data.valor}
-                  <span className="text-lg text-muted-foreground ml-2">
+                <p className="text-4xl font-bold">
+                  {item.data.valor}{" "}
+                  <span className="text-xl text-muted-foreground">
                     ({item.data.titulo})
                   </span>
                 </p>
               )}
 
-              {/* RENDERIZAÇÃO DE RESPOSTAS DE TEXTO */}
               {item.tipo === "texto" && (
-                <ScrollArea className="h-72 w-full rounded-md border p-4">
-                  <ul className="space-y-2">
+                <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+                  <ul className="space-y-3">
                     {item.data.map((texto: string, i: number) => (
                       <li
                         key={i}

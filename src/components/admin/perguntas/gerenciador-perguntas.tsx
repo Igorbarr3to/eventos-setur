@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Formulario, Pergunta } from "@prisma/client";
 import { ListChecks } from "lucide-react";
-import { CriarPerguntaModal } from "./criar-perguntas-moda";
+import { CriarPerguntaModal } from "./criar-perguntas-modal";
 import { EditarPerguntaModal } from "./editar-pergunta-modal";
 import { DeletarPerguntaBotao } from "./deletar-pergunta-modal";
 
@@ -90,7 +90,9 @@ export function GerenciadorDePerguntas({
                       ? "Opção"
                       : pergunta.tipoResposta === "MULTIPLA"
                       ? "Multipla"
-                      : "Municipio"}{" "}
+                      : pergunta.tipoResposta === "LOCALIDADE_MUNICIPIO"
+                      ? "Municipio"
+                      : "Grade de Multipla escolha"}{" "}
                     {pergunta.obrigatoria ? "(Obrigatória)" : ""}
                   </span>
                 </div>

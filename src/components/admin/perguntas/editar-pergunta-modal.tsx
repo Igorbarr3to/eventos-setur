@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pergunta, TipoResposta } from "@prisma/client";
 import { toast } from "sonner";
-import { Edit, PlusCircle, Trash2, X } from "lucide-react";
+import { Edit, PlusCircle, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -43,8 +43,9 @@ const formSchema = z
     obrigatoria: z.boolean(),
     incluirOpcaoOutro: z.boolean().default(false).optional(),
     opcoesMultiplas: z.array(z.object({ texto: z.string() })).optional(),
+    opcoesLinhas: z.array(z.object({ texto: z.string() })).optional(),
+    opcoesColunas: z.array(z.object({ texto: z.string() })).optional(),
   })
-
   .refine(
     (data) => {
       if (data.tipoResposta === "OPCAO" || data.tipoResposta === "MULTIPLA") {
@@ -53,6 +54,17 @@ const formSchema = z
           data.opcoesMultiplas.length > 0 &&
           data.opcoesMultiplas.every((opt) => opt.texto.trim().length > 0)
         );
+      }
+      if (data.tipoResposta === "GRADE_MULTIPLA_ESCOLHA") {
+        const linhasValidas =
+          data.opcoesLinhas &&
+          data.opcoesLinhas.length > 0 &&
+          data.opcoesLinhas.every((opt) => opt.texto.trim().length > 0);
+        const colunasValidas =
+          data.opcoesColunas &&
+          data.opcoesColunas.length > 0 &&
+          data.opcoesColunas.every((opt) => opt.texto.trim().length > 0);
+        return linhasValidas && colunasValidas;
       }
       return true;
     },
@@ -86,6 +98,16 @@ export function EditarPerguntaModal({
     control: form.control,
     name: "opcoesMultiplas",
   });
+  const {
+    fields: fieldsLinhas,
+    append: appendLinha,
+    remove: removeLinha,
+  } = useFieldArray({ control: form.control, name: "opcoesLinhas" });
+  const {
+    fields: fieldsColunas,
+    append: appendColuna,
+    remove: removeColuna,
+  } = useFieldArray({ control: form.control, name: "opcoesColunas" });
 
   useEffect(() => {
     if (open) {
@@ -99,7 +121,7 @@ export function EditarPerguntaModal({
       // Lógica para transformar o `opcoesJson` de volta para o estado do formulário
       if (pergunta.opcoesJson && typeof pergunta.opcoesJson === "object") {
         const opcoes = (pergunta.opcoesJson as any).opcoes;
-        const escala = pergunta.opcoesJson as any;
+        const grade = pergunta.opcoesJson as any;
 
         if (
           pergunta.tipoResposta === "OPCAO" ||
@@ -108,6 +130,13 @@ export function EditarPerguntaModal({
           defaultValues.opcoesMultiplas = Array.isArray(opcoes)
             ? opcoes.map((opt: string) => ({ texto: opt }))
             : [];
+        } else if (pergunta.tipoResposta === "GRADE_MULTIPLA_ESCOLHA") {
+          defaultValues.opcoesLinhas = Array.isArray(grade.linhas)
+            ? grade.linhas.map((l: string) => ({ texto: l }))
+            : [{ texto: "" }];
+          defaultValues.opcoesColunas = Array.isArray(grade.colunas)
+            ? grade.colunas.map((c: string) => ({ texto: c }))
+            : [{ texto: "" }];
         }
       }
 
@@ -122,6 +151,11 @@ export function EditarPerguntaModal({
     if (tipoSelecionado === "OPCAO" || tipoSelecionado === "MULTIPLA") {
       opcoesJson = {
         opcoes: data.opcoesMultiplas?.map((opt) => opt.texto).filter(Boolean),
+      };
+    } else if (tipoSelecionado === "GRADE_MULTIPLA_ESCOLHA") {
+      opcoesJson = {
+        linhas: data.opcoesLinhas?.map((opt) => opt.texto).filter(Boolean),
+        colunas: data.opcoesColunas?.map((opt) => opt.texto).filter(Boolean),
       };
     }
 
@@ -198,7 +232,7 @@ export function EditarPerguntaModal({
                       <SelectContent className="bg-white ">
                         {Object.values(TipoResposta).map((tipo) => (
                           <SelectItem key={tipo} value={tipo}>
-                            {tipo === "TEXTO"
+                          {tipo === "TEXTO"
                               ? "Texto"
                               : tipo === "NUMERO"
                               ? "Número"
@@ -206,6 +240,8 @@ export function EditarPerguntaModal({
                               ? "Opção"
                               : tipo === "MULTIPLA"
                               ? "Multipla"
+                              : tipo === "GRADE_MULTIPLA_ESCOLHA"
+                              ? "Grade Multipla Escolha"
                               : "Municipio"}
                           </SelectItem>
                         ))}
@@ -284,6 +320,89 @@ export function EditarPerguntaModal({
               </div>
             )}
 
+            {tipoSelecionado === "GRADE_MULTIPLA_ESCOLHA" && (
+              <div className="space-y-4">
+                {/* Inputs para as Linhas */}
+                <div className="space-y-2 p-4 border rounded-md">
+                  <FormLabel>Linhas (Sub-perguntas)</FormLabel>
+                  {fieldsLinhas.map((item, index) => (
+                    <FormField
+                      key={item.id}
+                      control={form.control}
+                      name={`opcoesLinhas.${index}.texto`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormControl>
+                              <Input
+                                placeholder={`Linha ${index + 1}`}
+                                {...field}
+                              />
+                            </FormControl>
+                            <Button
+                              type="button"
+                              onClick={() => removeLinha(index)}
+                              disabled={fieldsLinhas.length <= 1}
+                            >
+                              <X className="h-4 w-4 text-red-700" />
+                            </Button>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => appendLinha({ texto: "" })}
+                  >
+                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Linha
+                  </Button>
+                </div>
+                {/* Inputs para as Colunas */}
+                <div className="space-y-2 p-4 border rounded-md">
+                  <FormLabel>Colunas (Opções de Resposta)</FormLabel>
+                  {fieldsColunas.map((item, index) => (
+                    <FormField
+                      key={item.id}
+                      control={form.control}
+                      name={`opcoesColunas.${index}.texto`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormControl>
+                              <Input
+                                placeholder={`Coluna ${index + 1}`}
+                                {...field}
+                              />
+                            </FormControl>
+                            <Button
+                              type="button"
+                              onClick={() => removeColuna(index)}
+                              disabled={fieldsColunas.length <= 1}
+                            >
+                              <X className="h-4 w-4 text-red-700" />
+                            </Button>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => appendColuna({ texto: "" })}
+                  >
+                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Coluna
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <FormField
               control={form.control}
               name="obrigatoria"
@@ -307,7 +426,7 @@ export function EditarPerguntaModal({
                 </FormItem>
               )}
             />
-            
+
             <Button
               type="submit"
               disabled={form.formState.isSubmitting}

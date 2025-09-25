@@ -13,6 +13,8 @@ const createPerguntaSchema = z.object({
   obrigatoria: z.boolean().default(false),
   incluirOpcaoOutro: z.boolean().optional().default(false),
   opcoesJson: z.any().optional().nullable(), // Aceita qualquer estrutura JSON
+  opcoesLinhas: z.array(z.object({ texto: z.string() })).optional(),
+  opcoesColunas: z.array(z.object({ texto: z.string() })).optional(),
   ordem: z.number().int().optional(),
 });
 
