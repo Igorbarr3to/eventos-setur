@@ -25,13 +25,13 @@ interface PerguntaInfo {
 }
 interface DetalheResposta {
   valorTexto: string | null;
-  valorNumero: Decimal | null;
+  valorNumero: number | null;
   valorOpcao: string | null;
   pergunta: PerguntaInfo;
 }
 interface RespostaCompleta {
   id: string;
-  dataResposta: Date;
+  dataResposta: string;
   detalhes: DetalheResposta[];
 }
 

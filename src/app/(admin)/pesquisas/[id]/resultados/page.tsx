@@ -1,5 +1,5 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma"; // 👈 1. Importe o Prisma
 import VisualizacaoDeRespostas from "@/components/admin/respostas/visualizacao-respostas";
 import {
   Breadcrumb,
@@ -11,46 +11,70 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Pesquisa } from "@prisma/client";
 
-// 2. Simplifique a interface de props da página
-interface PageProps {
-  params: { id: string };
+interface PerguntaInfo {
+  texto: string;
+  tipoResposta: string;
 }
 
-// 3. Modifique as funções para usar o Prisma diretamente
-async function getRespostas(pesquisaId: string) {
-  try {
+interface DetalheResposta {
+  valorTexto: string | null;
+  valorNumero: number | null;
+  valorOpcao: string | null;
+  pergunta: PerguntaInfo;
+}
 
-    return await prisma.resposta.findMany({
-      where: { pesquisaId },
-      include: {
-        detalhes: {
-          include: {
-            pergunta: { select: { texto: true, tipoResposta: true } },
-          },
-        },
-      },
-      orderBy: { dataResposta: 'desc' },
-    });
+interface RespostaCompleta {
+  id: string;
+  dataResposta: string;
+  detalhes: DetalheResposta[];
+}
+
+export type PageProps = Promise<{id: string}>
+
+async function getRespostas(pesquisaId: string): Promise<RespostaCompleta[]> {
+  try {
+    const cookieStore = await cookies();
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/respostas?pesquisaId=${pesquisaId}`,
+      {
+        headers: { Cookie: cookieStore.toString() },
+        cache: "no-store",
+      }
+    );
+
+    if (!response.ok) {
+      console.error("Falha ao buscar respostas:", response.status);
+      return [];
+    }
+
+    return response.json();
   } catch (error) {
-    console.error("Erro ao buscar respostas diretamente:", error);
+    console.error("Erro crítico ao buscar respostas:", error);
     return [];
   }
 }
 
 async function getPesquisa(pesquisaId: string): Promise<Pesquisa | null> {
   try {
-    return await prisma.pesquisa.findUnique({
-      where: { id: pesquisaId },
-    });
+    const cookieStore = await cookies();
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/pesquisas/${pesquisaId}`,
+      {
+        headers: { Cookie: cookieStore.toString() },
+        cache: "no-store",
+      }
+    );
+
+    if (!response.ok) return null;
+    return response.json();
   } catch (error) {
-    console.error("Erro ao buscar detalhes da pesquisa:", error);
+    console.error("Falha ao buscar detalhes da pesquisa:", error);
     return null;
   }
 }
 
-// 4. Corrija a assinatura e a lógica da página
-export default async function PaginaResultados({ params }: PageProps) {
-  const { id } = params; // O ID já é uma string, sem 'await'
+export default async function PaginaResultados(props: {params: PageProps}) {
+  const { id } = await props.params;
 
   const [pesquisa, respostas] = await Promise.all([
     getPesquisa(id),
@@ -62,15 +86,15 @@ export default async function PaginaResultados({ params }: PageProps) {
   }
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 space-y-6">
+    <div className="p-4 sm:p-6 md:p-8">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/pesquisas">Pesquisas</BreadcrumbLink>
+            <BreadcrumbLink href="/pesquisas">Pesquisas</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/admin/pesquisas/${pesquisa.id}`}>
+            <BreadcrumbLink href={`/pesquisas/${pesquisa.id}`}>
               {pesquisa.titulo}
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -80,11 +104,8 @@ export default async function PaginaResultados({ params }: PageProps) {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      
-      {/* Passe o título também para o componente de visualização */}
-      <VisualizacaoDeRespostas
-        respostasIniciais={respostas}
-      />
+
+      <VisualizacaoDeRespostas respostasIniciais={respostas} />
     </div>
   );
 }
