@@ -174,7 +174,7 @@ export function CriarPerguntaModal({
           Adicionar Pergunta
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-white">
+      <DialogContent className="bg-white sm:max-w-2xl max-h-[85vh] overflow-y-auto" >
         <DialogHeader>
           <DialogTitle>Criar Nova Pergunta</DialogTitle>
         </DialogHeader>
@@ -183,7 +183,7 @@ export function CriarPerguntaModal({
             onSubmit={form.handleSubmit(onSubmit, (errors) => {
               console.log("Erros de validação do Zod:", errors);
             })}
-            className="space-y-4"
+            className="space-y-4 p-2"
           >
             <FormField
               control={form.control}

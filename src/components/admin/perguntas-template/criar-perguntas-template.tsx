@@ -179,7 +179,7 @@ export function CriarPerguntaTemplateModal({
           Adicionar Pergunta
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-white">
+      <DialogContent className="bg-white  sm:max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Criar Nova Pergunta</DialogTitle>
         </DialogHeader>
