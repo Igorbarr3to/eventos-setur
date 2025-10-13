@@ -16,9 +16,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Decimal } from "@prisma/client/runtime/library";
 
-// Tipos de dados esperados da API
 interface PerguntaInfo {
   texto: string;
   tipoResposta: string;
@@ -39,7 +37,7 @@ interface VisualizacaoDeRespostasProps {
   respostasIniciais: RespostaCompleta[];
 }
 
-// Cores para o gráfico de pizza
+
 const COLORS = [
   "#0088FE",
   "#00C49F",
@@ -50,7 +48,6 @@ const COLORS = [
   "#AF19FF",
 ];
 
-// Função para renderizar o label customizado da Pizza
 const renderCustomizedLabel = ({
   cx,
   cy,
@@ -110,7 +107,23 @@ export default function VisualizacaoDeRespostas({
     });
 
     return Object.entries(agregador).map(([perguntaTexto, dados]) => {
-      if (dados.tipo === "GRADE_MULTIPLA_ESCOLHA") {
+      if (dados.tipo === "LOCALIDADE_MUNICIPIO") {
+        const contagem = dados.respostas.reduce(
+          (acc: { [key: string]: number }, municipio: string) => {
+            acc[municipio] = (acc[municipio] || 0) + 1;
+            return acc;
+          },
+          {}
+        );
+        const dataForChart = Object.entries(contagem)
+          .map(([name, value]) => ({ name, value }))
+          .sort((a, b) => Number(b.value) - Number(a.value));
+        return {
+          pergunta: perguntaTexto,
+          tipo: "grafico_localidade",
+          data: dataForChart,
+        };
+      } else if (dados.tipo === "GRADE_MULTIPLA_ESCOLHA") {
         const contagem: { [linha: string]: { [coluna: string]: number } } = {};
         let todasColunas = new Set<string>();
 
@@ -132,8 +145,6 @@ export default function VisualizacaoDeRespostas({
           }
         });
 
-        // Transforma os dados para o formato que a Recharts espera para barras agrupadas:
-        // [{ name: "Alimentação", "Menos de R$100": 10, "Mais de R$100": 5 }, ...]
         const dataForChart = Object.entries(contagem).map(
           ([linha, colunas]) => ({
             name: linha, // O 'name' será o segmento (Alimentação, etc.)
@@ -188,7 +199,6 @@ export default function VisualizacaoDeRespostas({
           data: { titulo: "Média", valor: media.toFixed(2) },
         };
       } else {
-        // TEXTO ou LOCALIDADE_MUNICIPIO
         return {
           pergunta: perguntaTexto,
           tipo: "texto",
@@ -223,7 +233,42 @@ export default function VisualizacaoDeRespostas({
                 {item.pergunta}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex-grow flex items-center justify-center">
+            <CardContent className="flex-grow flex items-center justify-center p-0">
+              {item.tipo === "grafico_localidade" && isMounted && (
+                <ResponsiveContainer
+                  width="100%"
+                  height={Math.max(300, item.data.length * 40)}
+                >
+                  <BarChart
+                    layout="horizontal"
+                    data={item.data}
+                    margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    
+                    <XAxis type="category"
+                      dataKey="name"
+                      width={150}
+                      fontSize={12} />
+
+                    <YAxis
+                      type="number"
+                      allowDecimals={false}
+                    />
+                    
+                    <Tooltip
+                      contentStyle={{
+                        background: "white",
+                        border: "1px solid #ccc",
+                        borderRadius: "0.5rem",
+                      }}
+                    />
+                    <Legend />
+                    <Bar dataKey="value" name="Quantidade por municipio" fill="#8884d8" />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+
               {item.tipo === "grafico_barras_agrupadas" && isMounted && (
                 <ResponsiveContainer width="100%" height={400}>
                   <BarChart
