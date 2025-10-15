@@ -10,6 +10,9 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Pesquisa } from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Download } from "lucide-react";
 
 interface PerguntaInfo {
   texto: string;
@@ -104,6 +107,15 @@ export default async function PaginaResultados(props: {params: PageProps}) {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      <div className="text-right">
+      <Button asChild>
+          <Link href={`/api/admin/pesquisas/${pesquisa.id}/exportar`} target="_blank" className="bg-green-400">
+            <Download className="mr-2 h-4 w-4" />
+            Exportar para Planilha
+          </Link>
+        </Button>
+      </div>
 
       <VisualizacaoDeRespostas respostasIniciais={respostas} />
     </div>
